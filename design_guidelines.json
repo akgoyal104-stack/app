@@ -1,0 +1,138 @@
+{
+  "theme_strategy": {
+    "mode": "dark",
+    "rationale": "Astrology and cosmic themes naturally align with dark interfaces (night sky). Dark mode allows golden accents and starlight silver text to glow, enhancing the premium 'Gold Medalist' positioning."
+  },
+  "typography": {
+    "font_families": {
+      "headings": "Cormorant Garamond, serif",
+      "body": "Manrope, sans-serif",
+      "mono": "Space Mono, monospace"
+    },
+    "hierarchy": {
+      "h1": "text-5xl sm:text-6xl tracking-tighter font-serif font-light text-white",
+      "h2": "text-3xl sm:text-4xl tracking-tight font-serif font-medium text-amber-200",
+      "h3": "text-xl sm:text-2xl font-sans font-medium",
+      "body": "text-base leading-relaxed text-slate-300 font-sans",
+      "overline": "text-xs uppercase tracking-[0.2em] font-mono text-amber-500/80"
+    },
+    "rules": [
+      "NEVER use generic fonts (Inter/Roboto) for headings.",
+      "Use Cormorant Garamond for all primary titles to give a spiritual, authoritative Vedic feel.",
+      "Always use tight letter spacing on large text."
+    ]
+  },
+  "colors": {
+    "archetype": "ARCHETYPE 5: LUXURY (Premium, Depth, Mystery) blended with Cosmic Mysticism",
+    "palette": {
+      "background": "#05050A",
+      "surface": "#0C0C16",
+      "primary_gold": "#D4AF37",
+      "primary_gold_hover": "#F5D061",
+      "starlight_text": "#E2E8F0",
+      "muted_nebula": "#1E1E30",
+      "border_glow": "rgba(212, 175, 55, 0.2)"
+    },
+    "css_variables_update": {
+      "--background": "240 33% 3%",
+      "--foreground": "210 20% 98%",
+      "--card": "240 25% 6%",
+      "--card-foreground": "210 20% 98%",
+      "--primary": "46 65% 52%",
+      "--primary-foreground": "240 33% 3%",
+      "--border": "240 25% 15%",
+      "--ring": "46 65% 52%"
+    },
+    "rules": [
+      "Avoid #7351B7 (Forbidden AI color) and teal.",
+      "Use tinted greys (cool blue/purple undertones) instead of pure black.",
+      "Limit the primary gold color to CTAs and important highlights."
+    ]
+  },
+  "surfaces_and_visuals": {
+    "glassmorphism": {
+      "usage": ["Sticky Headers", "Floating Navs", "Chat Interface Overlays"],
+      "classes": "backdrop-blur-xl bg-[#05050A]/60 border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.4)]",
+      "rule": "NEVER use completely transparent backgrounds where content scrolls underneath."
+    },
+    "cards_bento": {
+      "usage": ["Dashboard Widgets", "Horoscope Readers"],
+      "classes": "bg-card border border-border/50 hover:border-primary/30 transition-colors duration-300 rounded-2xl"
+    },
+    "textures": [
+      "Add a subtle CSS noise overlay to the hero section to kill digital flatness.",
+      "Use radial gradients sparingly to create a 'glow' behind golden elements (e.g., bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-amber-900/20 via-transparent to-transparent)."
+    ]
+  },
+  "components": {
+    "buttons": "Pill-shaped (rounded-full) or soft-rounded (rounded-xl) with a glowing hover effect. Primary: bg-primary text-primary-foreground hover:bg-amber-300.",
+    "inputs": "bg-muted_nebula border-white/10 focus:border-primary focus:ring-1 focus:ring-primary rounded-xl text-white.",
+    "tabs": "Custom Shadcn tabs for Daily/Weekly/Monthly horoscopes. Override fixed heights. Active tab should have a golden bottom border or golden text.",
+    "chat_interface": "Use a specialized glassmorphic container for the AI Astrologer. User messages: muted background. AI messages: subtle gold/nebula tint.",
+    "required_shadcn": ["button", "input", "select", "card", "dialog", "form", "tabs", "dropdown-menu", "sonner"]
+  },
+  "grids_and_layouts": {
+    "spacing": "Generous spacing. Use p-8 to p-12 for dashboard cards and sections. Use massive vertical padding (py-24 or py-32) for landing page sections.",
+    "marketing_page": "Asymmetric layouts. Large portrait of Acharya Akash overlapping a cosmic background. Text heavy on one side, visual heavy on the other.",
+    "dashboard_grid": "Bento Grid (MODE B). grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6. Charts span 2 cols, small metrics (moon phase, lucky color) span 1 col."
+  },
+  "motion": {
+    "hover_states": "Buttons lift slightly (-translate-y-1) and increase glow. Cards get a border color shift to gold/amber.",
+    "page_transitions": "Fade in and slide up (framer-motion).",
+    "marquee": "Use a slow-moving editorial ribbon for zodiac signs separating the hero and the pricing section."
+  },
+  "media": {
+    "image_urls": [
+      {
+        "url": "https://images.unsplash.com/photo-1462332420958-a05d1e002413?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2ODl8MHwxfHNlYXJjaHwxfHxteXN0aWNhbCUyMG5lYnVsYSUyMGRlZXAlMjBzcGFjZXxlbnwwfHx8fDE3ODM2NTI5OTF8MA&ixlib=rb-4.1.0&q=85",
+        "description": "Deep space nebula - use as Hero background overlay with opacity-40",
+        "category": "background"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1706800696671-570820e7ff39?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2ODl8MHwxfHNlYXJjaHwyfHxteXN0aWNhbCUyMG5lYnVsYSUyMGRlZXAlMjBzcGFjZXxlbnwwfHx8fDE3ODM2NTI5OTF8MA&ixlib=rb-4.1.0&q=85",
+        "description": "Star cluster - use for AI Chat background or Pricing section background",
+        "category": "background"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1729335511883-29eade10006b?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1Mjh8MHwxfHNlYXJjaHwxfHxnb2xkZW4lMjB6b2RpYWMlMjBhc3Ryb2xvZ3klMjB3aGVlbHxlbnwwfHx8fDE3ODQwODg1MTN8MA&ixlib=rb-4.1.0&q=85",
+        "description": "Golden zodiac wheel - use in the Birth Chart generation section or Dashboard",
+        "category": "feature_visual"
+      },
+      {
+        "url": "https://images.pexels.com/photos/36750427/pexels-photo-36750427.jpeg",
+        "description": "Spiritual elderly man in yellow/gold - use as the portrait for Acharya Akash on the landing page",
+        "category": "portrait"
+      }
+    ],
+    "icons_library": "lucide-react (default). Use thin strokes for mystical feel."
+  },
+  "accessibility": {
+    "contrast": "Ensure text over nebula backgrounds has sufficient contrast (use bg-black/50 overlays or text-shadows).",
+    "data_testid": "ALL interactive elements (buttons, inputs, links, tabs) MUST have a data-testid attribute in kebab-case."
+  },
+  "instructions_to_main_agent": [
+    "Run 'npm install framer-motion clsx tailwind-merge lucide-react sonner react-router-dom react-hook-form @hookform/resolvers zod'",
+    "Add UI components: 'npx shadcn-ui@latest add button input select card dialog form tabs dropdown-menu sonner'",
+    "CRITICAL: Generate all components as `.js` or `.jsx` files, NOT `.tsx` files.",
+    "Initialize standard Shadcn and apply the dark mode config provided in the css variables.",
+    "Build a Landing Page routing to `/` and Dashboard routing to `/dashboard`.",
+    "On the landing page, create a grand introduction for Acharya Akash (Gold Medalist) with his portrait and credentials.",
+    "Implement the Dashboard with a Bento Grid layout for Horoscope, Birth Chart, and Compatibility.",
+    "Implement the AI Astrologer chat.",
+    "Create a beautiful pricing page (₹999, ₹1499 packages) and premium subscription toggle."
+  ],
+  "UNIVERSAL_GUIDELINES_FOR_MAIN_AGENT": [
+    "Avoid the 'AI slop' aesthetic: no generic centered layouts, simplistic gradients, and uniform styling.",
+    "Create depth through layered design elements with z-index hierarchy.",
+    "Use glass-morphism effects with backdrop filters (12-24px blur). NEVER use completely transparent backgrounds for overlays.",
+    "MUST NOT apply universal transition (e.g., transition: all). Add transitions for specific interactive elements.",
+    "MUST NOT center align the app container (.App { text-align: center; }).",
+    "Always use modern button styles (pill-shaped or soft-rounded) with interaction animations & color relevant to the app style.",
+    "NEVER use AI assistant Emoji characters for icons.",
+    "Every interaction needs micro-animations - hover states, transitions.",
+    "Use 2-3x more spacing than feels comfortable. Cramped designs look cheap.",
+    "MUST use the provided image URLs. NEVER use placeholder text for images.",
+    "Prioritize using pre-existing components from src/components/ui.",
+    "Use 'sonner' for toasts."
+  ]
+}
