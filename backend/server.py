@@ -522,7 +522,7 @@ async def compatibility(req: CompatibilityReq):
     return {"sign_a": a, "sign_b": b, "analysis": text}
 
 # ================= AI Chat =================
-@api_router.post("/chat/stream")
+#@api_router.post("/chat/stream")
 async def chat_stream(req: ChatReq, user=Depends(get_current_user)):
     """Server-Sent Events stream of Claude's reply, token by token."""
     from emergentintegrations.llm.chat import TextDelta, StreamDone
@@ -582,7 +582,7 @@ async def chat_stream(req: ChatReq, user=Depends(get_current_user)):
         headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
     )
 
-@api_router.post("/chat")
+#@api_router.post("/chat")
 async def chat(req: ChatReq, user=Depends(get_current_user)):
     session_id = req.session_id or str(uuid.uuid4())
     # Load history for context
@@ -618,7 +618,7 @@ async def chat(req: ChatReq, user=Depends(get_current_user)):
     })
     return {"session_id": session_id, "reply": reply}
 
-@api_router.get("/chat/sessions")
+#@api_router.get("/chat/sessions")
 async def chat_sessions(user=Depends(get_current_user)):
     pipeline = [
         {"$match": {"user_id": user["id"]}},
@@ -634,7 +634,7 @@ async def chat_sessions(user=Depends(get_current_user)):
     items = await db.chat_messages.aggregate(pipeline).to_list(30)
     return {"sessions": [{"session_id": i["_id"], "last_message": i["last_message"], "last_at": i["last_at"]} for i in items]}
 
-@api_router.get("/chat/{session_id}/messages")
+#@api_router.get("/chat/{session_id}/messages")
 async def chat_messages(session_id: str, user=Depends(get_current_user)):
     msgs = await db.chat_messages.find(
         {"user_id": user["id"], "session_id": session_id}, {"_id": 0}
@@ -703,7 +703,7 @@ async def upi_confirm(req: UpiConfirmReq, user=Depends(get_current_user)):
     logger.info(f"[UPI CONFIRM] user={user['id']} pkg={req.package_id} utr={req.utr}")
     return {"id": conf_id, "status": "reported"}
 
-@api_router.post("/payments/checkout")
+#@api_router.post("/payments/checkout")
 async def create_checkout(req: CheckoutReq, request: Request, user=Depends(get_current_user)):
     if req.package_id not in PACKAGES:
         raise HTTPException(400, "Invalid package")
@@ -742,7 +742,7 @@ async def create_checkout(req: CheckoutReq, request: Request, user=Depends(get_c
     })
     return {"checkout_url": session.url, "session_id": session.session_id}
 
-@api_router.get("/payments/status/{session_id}")
+#@api_router.get("/payments/status/{session_id}")
 async def payment_status(session_id: str):
     record = await db.payment_transactions.find_one({"session_id": session_id}, {"_id": 0})
     if not record:
@@ -775,7 +775,7 @@ async def payment_status(session_id: str):
         "package_id": record.get("package_id"),
     }
 
-@api_router.post("/webhook/stripe")
+#@api_router.post("/webhook/stripe")
 async def stripe_webhook(request: Request):
     body = await request.body()
     sig = request.headers.get("Stripe-Signature", "")
