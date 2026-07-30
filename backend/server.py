@@ -15,10 +15,10 @@ import uuid
 from datetime import datetime, timezone, timedelta, date
 import bcrypt
 import jwt as pyjwt
-from emergentintegrations.llm.chat import LlmChat, UserMessage
-from emergentintegrations.payments.stripe.checkout import (
-    StripeCheckout, CheckoutSessionRequest,
-)
+#from emergentintegrations.llm.chat import LlmChat, UserMessage
+#from emergentintegrations.payments.stripe.checkout import (
+    #StripeCheckout, CheckoutSessionRequest,
+#)
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
@@ -36,8 +36,8 @@ db = client[os.environ['DB_NAME']]
 
 JWT_SECRET = os.environ['JWT_SECRET']
 JWT_ALGO = "HS256"
-EMERGENT_LLM_KEY = os.environ['EMERGENT_LLM_KEY']
-STRIPE_API_KEY = os.environ['STRIPE_API_KEY']
+#EMERGENT_LLM_KEY = os.environ['EMERGENT_LLM_KEY']
+#STRIPE_API_KEY = os.environ['STRIPE_API_KEY']
 
 app = FastAPI()
 api_router = APIRouter(prefix="/api")
