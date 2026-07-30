@@ -518,7 +518,7 @@ async def compatibility(req: CompatibilityReq):
         "## Long-term Prospects, ## Challenges, ## Advice. Be honest and warm."
     )
     prompt = f"Analyse Vedic compatibility between {a} and {b}."
-    text = await call_llm(system, prompt, session_id=f"compat-{a}-{b}-{uuid.uuid4()}")
+    text = NA
     return {"sign_a": a, "sign_b": b, "analysis": text}
 
 # ================= AI Chat =================
