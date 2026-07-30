@@ -329,7 +329,7 @@ async def get_horoscope(sign: str, period: str = "daily"):
         "Return ONLY the reading text, 4-6 sentences, no preamble."
     )
     prompt = f"Write a {period} horoscope for {sign_norm} for {today}. Include a lucky color and a lucky number."
-    text = await call_llm(system, prompt, session_id=f"horo-{sign_norm}-{period}-{cache_key}")
+  #  text = await call_llm(system, prompt, session_id=f"horo-{sign_norm}-{period}-{cache_key}")
     doc = {
         "sign": sign_norm,
         "period": period,
@@ -372,7 +372,7 @@ async def birth_chart(req: BirthDetails, user=Depends(get_current_user)):
         f"COMPUTED CHART DATA (interpret this):\n{chart_facts}\n\n"
         "Write a detailed Vedic natal chart reading grounded strictly in these placements."
     )
-    reading = await call_llm(system, prompt, session_id=f"chart-{user['id']}-{uuid.uuid4()}")
+   # reading = await call_llm(system, prompt, session_id=f"chart-{user['id']}-{uuid.uuid4()}")
     chart_id = str(uuid.uuid4())
     doc = {
         "id": chart_id,
@@ -608,7 +608,7 @@ async def chat(req: ChatReq, user=Depends(get_current_user)):
     if history:
         past = "\n".join([f"{m['role'].upper()}: {m['content']}" for m in history[-10:]])
         context_prompt = f"Previous conversation:\n{past}\n\nCurrent question: {req.message}"
-    reply = await call_llm(system, context_prompt, session_id=session_id)
+   # reply = await call_llm(system, context_prompt, session_id=session_id)
     await db.chat_messages.insert_one({
         "user_id": user["id"],
         "session_id": session_id,
