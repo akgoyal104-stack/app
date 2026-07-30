@@ -23,7 +23,9 @@ from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
 from reportlab.lib.colors import HexColor
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+from reportlab.lib import colors as _colors
+from astro import compute_chart, chart_summary_for_llm
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -48,14 +50,14 @@ PACKAGES: Dict[str, Dict[str, Any]] = {
         "amount": 499.0,
         "currency": "inr",
         "mode": "payment",
-        "description": "Ask up to 3 focused Vedic astrology questions and receive a considered written response from Acharya Akash within 24 hours.",
+        "description": "A focused consultation with Acharya Akash. Both chat and call options available.",
     },
     "detailed_reading": {
         "name": "Detailed Reading",
         "amount": 999.0,
         "currency": "inr",
         "mode": "payment",
-        "description": "In-depth personal Kundali reading — dashas, planetary periods, and life-area analysis delivered as a PDF plus a 30-minute call with Acharya Akash.",
+        "description": "An in-depth Vedic reading with Acharya Akash. Both chat and call options available.",
     },
 }
 
@@ -258,21 +260,31 @@ async def get_horoscope(sign: str, period: str = "daily"):
 # ================= Birth Chart =================
 @api_router.post("/birth-chart")
 async def birth_chart(req: BirthDetails, user=Depends(get_current_user)):
-    sun_sign = sun_sign_from_date(req.date_of_birth)
+    # Compute accurate Vedic chart via Swiss Ephemeris (Lahiri sidereal, Whole Sign houses)
+    try:
+        chart = compute_chart(req.date_of_birth, req.time_of_birth, req.place_of_birth)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+    except Exception as e:
+        logging.exception("chart compute failed")
+        raise HTTPException(500, f"Chart computation failed: {e}")
+
+    chart_facts = chart_summary_for_llm(chart)
     system = (
         "You are Acharya Akash, Gold Medalist Vedic astrologer from KN Rao's institute (BVB, New Delhi). "
-        "Given a birth date, time, and place, produce an authentic Vedic natal chart (Kundali) analysis. "
+        "You are given the ACCURATE computed Vedic chart data (Lahiri ayanamsa, Whole Sign houses). "
+        "Interpret ONLY from these exact placements — do not invent different positions. "
         "Structure the response in clear sections using markdown headings: "
-        "## Lagna (Ascendant), ## Rashi (Moon Sign), ## Sun Sign, ## Key Planetary Positions, "
-        "## Personality & Nature, ## Career & Purpose, ## Relationships, ## Current Dasha & Guidance. "
-        "Keep each section 2-4 sentences. Be warm, specific, and grounded in Vedic tradition."
+        "## Lagna & Personality, ## Moon Nakshatra & Mind, ## Key Planetary Yogas, "
+        "## Career & Purpose, ## Relationships & Family, ## Wealth & Health, "
+        "## Current Vimshottari Mahadasha, ## Remedies & Guidance. "
+        "Keep each section 2-4 sentences. Be specific, cite the actual houses/signs from the data."
     )
     prompt = (
-        f"Native name: {req.name or 'Seeker'}\n"
-        f"Date of birth: {req.date_of_birth}\n"
-        f"Time of birth: {req.time_of_birth}\n"
-        f"Place of birth: {req.place_of_birth}\n\n"
-        "Generate a detailed Vedic natal chart reading."
+        f"Native: {req.name or 'Seeker'}\n"
+        f"Birth: {req.date_of_birth} {req.time_of_birth} at {req.place_of_birth}\n\n"
+        f"COMPUTED CHART DATA (interpret this):\n{chart_facts}\n\n"
+        "Write a detailed Vedic natal chart reading grounded strictly in these placements."
     )
     reading = await call_llm(system, prompt, session_id=f"chart-{user['id']}-{uuid.uuid4()}")
     chart_id = str(uuid.uuid4())
@@ -283,7 +295,10 @@ async def birth_chart(req: BirthDetails, user=Depends(get_current_user)):
         "date_of_birth": req.date_of_birth,
         "time_of_birth": req.time_of_birth,
         "place_of_birth": req.place_of_birth,
-        "sun_sign": sun_sign,
+        "sun_sign": chart["sun_sign"],
+        "moon_sign": chart["moon_sign"],
+        "ascendant": chart["ascendant"],
+        "chart_data": chart,
         "reading": reading,
         "created_at": datetime.now(timezone.utc).isoformat(),
     }
@@ -319,8 +334,62 @@ async def chart_pdf(chart_id: str, user=Depends(get_current_user)):
     story.append(Paragraph(f"<b>Date of Birth:</b> {chart['date_of_birth']}", meta_style))
     story.append(Paragraph(f"<b>Time of Birth:</b> {chart['time_of_birth']}", meta_style))
     story.append(Paragraph(f"<b>Place of Birth:</b> {chart['place_of_birth']}", meta_style))
-    story.append(Paragraph(f"<b>Sun Sign:</b> {chart['sun_sign']}", meta_style))
-    story.append(Spacer(1, 12))
+    story.append(Paragraph(f"<b>Ayanamsa:</b> Lahiri • <b>Houses:</b> Whole Sign", meta_style))
+    story.append(Spacer(1, 8))
+
+    cdata = chart.get("chart_data")
+    if cdata:
+        asc = cdata["ascendant"]
+        story.append(Paragraph(
+            f"<b>Lagna (Ascendant):</b> {asc['sign']} {asc['degrees']}° — {asc['nakshatra']} pada {asc['pada']}",
+            meta_style))
+        story.append(Paragraph(
+            f"<b>Moon Rashi:</b> {cdata['moon_sign']} ({cdata['moon_nakshatra']})   "
+            f"<b>Sun Rashi:</b> {cdata['sun_sign']}",
+            meta_style))
+        cd = cdata.get("current_mahadasha")
+        if cd:
+            story.append(Paragraph(
+                f"<b>Current Mahadasha:</b> {cd['lord']}   ({cd['start']} → {cd['end']})",
+                meta_style))
+        story.append(Spacer(1, 12))
+        # Planet table
+        story.append(Paragraph("Planetary Positions", h2_style))
+        tbl = [["Planet", "Sign", "Degrees", "House", "Nakshatra", "Pada"]]
+        for p in cdata["planets"]:
+            name = p["name"] + (" ℞" if p.get("retrograde") else "")
+            tbl.append([name, p["sign"], f"{p['degrees']}°", str(p["house"]), p["nakshatra"], str(p["pada"])])
+        t = Table(tbl, hAlign="LEFT", colWidths=[70, 65, 55, 45, 95, 40])
+        t.setStyle(TableStyle([
+            ("BACKGROUND", (0, 0), (-1, 0), HexColor("#8B6A1D")),
+            ("TEXTCOLOR", (0, 0), (-1, 0), _colors.white),
+            ("FONTNAME", (0, 0), (-1, 0), "Times-Bold"),
+            ("FONTSIZE", (0, 0), (-1, -1), 9),
+            ("GRID", (0, 0), (-1, -1), 0.25, HexColor("#CCCCCC")),
+            ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+            ("ROWBACKGROUNDS", (0, 1), (-1, -1), [_colors.white, HexColor("#F7F1E1")]),
+        ]))
+        story.append(t)
+        story.append(Spacer(1, 14))
+        # Houses
+        story.append(Paragraph("Houses (Bhavas)", h2_style))
+        htbl = [["House", "Sign", "Occupants"]]
+        for h in cdata["houses"]:
+            htbl.append([f"H{h['house']}", h["sign"], ", ".join(h["planets"]) or "—"])
+        t2 = Table(htbl, hAlign="LEFT", colWidths=[50, 90, 240])
+        t2.setStyle(TableStyle([
+            ("BACKGROUND", (0, 0), (-1, 0), HexColor("#8B6A1D")),
+            ("TEXTCOLOR", (0, 0), (-1, 0), _colors.white),
+            ("FONTNAME", (0, 0), (-1, 0), "Times-Bold"),
+            ("FONTSIZE", (0, 0), (-1, -1), 9),
+            ("GRID", (0, 0), (-1, -1), 0.25, HexColor("#CCCCCC")),
+            ("ROWBACKGROUNDS", (0, 1), (-1, -1), [_colors.white, HexColor("#F7F1E1")]),
+        ]))
+        story.append(t2)
+        story.append(Spacer(1, 14))
+    else:
+        story.append(Paragraph(f"<b>Sun Sign:</b> {chart.get('sun_sign','')}", meta_style))
+        story.append(Spacer(1, 12))
 
     # Simple markdown → PDF: split by ## headings
     text = chart.get("reading", "")

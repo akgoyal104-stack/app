@@ -34,16 +34,16 @@ export default function Pricing() {
 
   const features = {
     basic_questions: [
-      "Up to 3 focused questions",
-      "Written response within 24 hrs",
+      "Chat option available",
+      "Call option available",
+      "Response within 24 hours",
       "Vedic (Parashari) analysis",
-      "Follow-up clarifications by email",
     ],
     detailed_reading: [
-      "Full Kundali (natal chart) PDF",
-      "Dashas & planetary periods",
-      "Career • love • health analysis",
-      "30-min live call with Acharya Akash",
+      "Chat option available",
+      "Call option available",
+      "In-depth planetary analysis",
+      "Career • love • health guidance",
       "Remedies rooted in tradition",
     ],
   };
