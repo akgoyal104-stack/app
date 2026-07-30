@@ -4,7 +4,20 @@ import { Sparkles, Star, Moon, Sun, Compass, Award, GraduationCap, MessageCircle
 import Footer, { PROFILE, whatsappLink } from "@/components/Footer";
 import ZodiacWheel from "@/components/ZodiacWheel";
 
-const ZODIACS = ["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"];
+const ZODIACS = [
+  { en: "Aries", sa: "Mesha" },
+  { en: "Taurus", sa: "Vrishabha" },
+  { en: "Gemini", sa: "Mithuna" },
+  { en: "Cancer", sa: "Karka" },
+  { en: "Leo", sa: "Simha" },
+  { en: "Virgo", sa: "Kanya" },
+  { en: "Libra", sa: "Tula" },
+  { en: "Scorpio", sa: "Vrishchika" },
+  { en: "Sagittarius", sa: "Dhanu" },
+  { en: "Capricorn", sa: "Makara" },
+  { en: "Aquarius", sa: "Kumbha" },
+  { en: "Pisces", sa: "Meena" },
+];
 
 export default function Landing() {
   return (
@@ -76,11 +89,12 @@ export default function Landing() {
       </section>
 
       {/* Marquee */}
-      <div className="border-y border-white/5 py-6 overflow-hidden bg-black/40">
+      <div className="border-y border-white/10 py-6 overflow-hidden bg-black/20 backdrop-blur-sm">
         <div className="marquee-track">
           {[...ZODIACS, ...ZODIACS].map((z, i) => (
-            <span key={i} className="mx-10 text-2xl font-serif-display text-slate-500 whitespace-nowrap">
-              ✧ {z}
+            <span key={i} className="mx-10 whitespace-nowrap flex items-baseline gap-2">
+              <span className="text-2xl font-serif-display text-gold">✧ {z.sa}</span>
+              <span className="text-sm font-mono uppercase tracking-widest text-amber-300/50">{z.en}</span>
             </span>
           ))}
         </div>

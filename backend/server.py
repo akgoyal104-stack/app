@@ -101,6 +101,22 @@ class LoginReq(BaseModel):
     email: EmailStr
     password: str
 
+class PhoneOtpReq(BaseModel):
+    phone: str = Field(min_length=10, max_length=15)
+
+class PhoneVerifyReq(BaseModel):
+    phone: str
+    otp: str
+    name: Optional[str] = None
+
+class UpiConfirmReq(BaseModel):
+    package_id: str
+    utr: str = Field(min_length=6, max_length=30)
+    amount: float
+    consultation_mode: Optional[str] = None
+    screenshot_base64: Optional[str] = None  # data URL or raw base64
+    note: Optional[str] = None
+
 class BirthDetails(BaseModel):
     name: Optional[str] = None
     date_of_birth: str  # YYYY-MM-DD
@@ -211,6 +227,73 @@ async def login(req: LoginReq):
 @api_router.get("/auth/me")
 async def me(user=Depends(get_current_user)):
     return user
+
+# ================= Phone OTP (demo — see note in finish summary) =================
+import random as _random
+
+def _normalize_phone(p: str) -> str:
+    return "".join(ch for ch in p if ch.isdigit())[-10:]
+
+@api_router.post("/auth/phone/send-otp")
+async def phone_send_otp(req: PhoneOtpReq):
+    phone = _normalize_phone(req.phone)
+    if len(phone) != 10:
+        raise HTTPException(400, "Enter a valid 10-digit mobile number")
+    otp = f"{_random.randint(100000, 999999)}"
+    expires_at = datetime.now(timezone.utc) + timedelta(minutes=5)
+    await db.phone_otps.update_one(
+        {"phone": phone},
+        {"$set": {
+            "phone": phone,
+            "otp": otp,
+            "expires_at": expires_at.isoformat(),
+            "attempts": 0,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+        }},
+        upsert=True,
+    )
+    logger.info(f"[DEMO OTP] phone={phone} otp={otp}")
+    # In production this would be sent via Twilio/MSG91.
+    # For demo, we return the OTP so the seeker can complete the flow.
+    return {"sent": True, "phone": phone, "demo_otp": otp,
+            "note": "Demo mode — OTP shown here. Plug in Twilio/MSG91 for real SMS."}
+
+@api_router.post("/auth/phone/verify")
+async def phone_verify(req: PhoneVerifyReq):
+    phone = _normalize_phone(req.phone)
+    rec = await db.phone_otps.find_one({"phone": phone})
+    if not rec:
+        raise HTTPException(400, "Request an OTP first")
+    exp = datetime.fromisoformat(rec["expires_at"])
+    if datetime.now(timezone.utc) > exp:
+        raise HTTPException(400, "OTP expired. Request a new one.")
+    if rec.get("attempts", 0) >= 5:
+        raise HTTPException(400, "Too many attempts. Request a new OTP.")
+    if req.otp.strip() != rec["otp"]:
+        await db.phone_otps.update_one({"phone": phone}, {"$inc": {"attempts": 1}})
+        raise HTTPException(400, "Invalid OTP")
+    # Find or create user by phone
+    user = await db.users.find_one({"phone": phone})
+    if not user:
+        user_id = str(uuid.uuid4())
+        user = {
+            "id": user_id,
+            "name": req.name or f"Seeker {phone[-4:]}",
+            "phone": phone,
+            "email": None,
+            "password_hash": None,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "is_premium": False,
+        }
+        await db.users.insert_one(user)
+    await db.phone_otps.delete_one({"phone": phone})
+    token = make_token(user["id"], user.get("email") or f"{phone}@phone.local")
+    return {
+        "token": token,
+        "user": {"id": user["id"], "name": user["name"], "email": user.get("email"),
+                 "phone": user.get("phone"), "is_premium": user.get("is_premium", False)},
+    }
+
 
 # ================= Horoscopes =================
 @api_router.get("/horoscopes/signs")
@@ -587,6 +670,38 @@ async def upi_info(package_id: Optional[str] = None):
 @api_router.get("/payments/packages")
 async def get_packages():
     return {"packages": [{"id": k, **v} for k, v in PACKAGES.items()]}
+
+@api_router.post("/payments/upi-confirm")
+async def upi_confirm(req: UpiConfirmReq, user=Depends(get_current_user)):
+    if req.package_id not in PACKAGES:
+        raise HTTPException(400, "Invalid package")
+    pkg = PACKAGES[req.package_id]
+    consultation_mode = req.consultation_mode if req.consultation_mode in {"chat", "call"} else "chat"
+    shot = req.screenshot_base64 or ""
+    if shot and len(shot) > 6 * 1024 * 1024:
+        raise HTTPException(413, "Screenshot too large (max ~4MB)")
+    conf_id = str(uuid.uuid4())
+    doc = {
+        "id": conf_id,
+        "user_id": user["id"],
+        "user_name": user.get("name"),
+        "user_email": user.get("email"),
+        "user_phone": user.get("phone"),
+        "package_id": req.package_id,
+        "package_name": pkg["name"],
+        "amount": float(req.amount or pkg["amount"]),
+        "currency": "inr",
+        "utr": req.utr.strip(),
+        "consultation_mode": consultation_mode,
+        "note": req.note,
+        "screenshot_base64": shot,
+        "method": "upi",
+        "status": "reported",
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    }
+    await db.upi_payments.insert_one(doc.copy())
+    logger.info(f"[UPI CONFIRM] user={user['id']} pkg={req.package_id} utr={req.utr}")
+    return {"id": conf_id, "status": "reported"}
 
 @api_router.post("/payments/checkout")
 async def create_checkout(req: CheckoutReq, request: Request, user=Depends(get_current_user)):

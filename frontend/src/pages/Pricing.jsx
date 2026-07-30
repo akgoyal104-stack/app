@@ -2,10 +2,14 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { api } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
-import { Loader2, Check, MessageCircle, Phone, Copy, QrCode } from "lucide-react";
+import { PROFILE, whatsappLink } from "@/components/Footer";
+import { Loader2, Check, MessageCircle, Phone, Copy, QrCode, CheckCircle2, Upload, X } from "lucide-react";
 
 export default function Pricing() {
   const [packages, setPackages] = useState([]);
@@ -13,6 +17,10 @@ export default function Pricing() {
   const [modes, setModes] = useState({});   // per-package: chat|call
   const [upi, setUpi] = useState(null);
   const [upiPkg, setUpiPkg] = useState("detailed_reading");
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirm, setConfirm] = useState({ utr: "", screenshot: "", filename: "", note: "" });
+  const [submitting, setSubmitting] = useState(false);
+  const [confirmedId, setConfirmedId] = useState(null);
   const { user } = useAuth();
   const nav = useNavigate();
 
@@ -64,6 +72,54 @@ export default function Pricing() {
   const copy = (v) => {
     navigator.clipboard.writeText(v);
     toast.success("Copied to clipboard");
+  };
+
+  const openConfirm = () => {
+    if (!user) { nav("/auth?mode=signup"); return; }
+    setConfirm({ utr: "", screenshot: "", filename: "", note: "" });
+    setConfirmedId(null);
+    setConfirmOpen(true);
+  };
+
+  const handleFile = (e) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    if (f.size > 4 * 1024 * 1024) { toast.error("Screenshot too large (max 4MB)"); return; }
+    const reader = new FileReader();
+    reader.onload = () => setConfirm(c => ({ ...c, screenshot: reader.result, filename: f.name }));
+    reader.readAsDataURL(f);
+  };
+
+  const submitConfirm = async () => {
+    if (!confirm.utr || confirm.utr.trim().length < 6) {
+      toast.error("Enter a valid UTR / reference number");
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const pkg = packages.find(p => p.id === upiPkg);
+      const r = await api.post("/payments/upi-confirm", {
+        package_id: upiPkg,
+        utr: confirm.utr.trim(),
+        amount: pkg?.amount || 0,
+        consultation_mode: modes[upiPkg] || "chat",
+        screenshot_base64: confirm.screenshot,
+        note: confirm.note,
+      });
+      setConfirmedId(r.data.id);
+      toast.success("Payment reported. Acharya will confirm shortly.");
+    } catch (e) {
+      toast.error(e.response?.data?.detail || "Could not submit");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const confirmWhatsapp = () => {
+    const pkg = packages.find(p => p.id === upiPkg);
+    return whatsappLink(
+      `Namaste Acharya Akash — I've paid ₹${pkg?.amount} for "${pkg?.name}" via UPI (${modes[upiPkg] || 'chat'} mode). UTR: ${confirm.utr}. Please confirm and schedule.`
+    );
   };
 
   return (
@@ -209,10 +265,17 @@ export default function Pricing() {
                 >
                   Open in UPI app
                 </a>
+                <Button
+                  data-testid="upi-confirm-btn"
+                  onClick={openConfirm}
+                  className="rounded-full bg-emerald-500/90 text-white hover:bg-emerald-500"
+                >
+                  <CheckCircle2 className="w-4 h-4 mr-2" /> I paid via UPI
+                </Button>
               </div>
 
               <p className="text-xs text-slate-500 mt-6 leading-relaxed">
-                After payment, share the screenshot or transaction ID on WhatsApp so Acharya Akash can confirm and schedule your session.
+                After payment, tap <span className="text-emerald-400">"I paid via UPI"</span> to submit your UTR and screenshot — Acharya will confirm and schedule your session directly.
               </p>
             </div>
           </CardContent>
@@ -222,6 +285,115 @@ export default function Pricing() {
       <p className="text-xs text-slate-500 mt-10 text-center">
         Card payments processed securely by Stripe. Use test card 4242 4242 4242 4242 with any future expiry.
       </p>
+
+      {/* UPI Confirmation Dialog */}
+      <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <DialogContent className="bg-[#1B1655] border-white/10 text-white max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-serif-display text-2xl">
+              {confirmedId ? "Payment reported ✨" : "Confirm your UPI payment"}
+            </DialogTitle>
+          </DialogHeader>
+          {confirmedId ? (
+            <div className="space-y-5 py-4">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center">
+                  <CheckCircle2 className="w-6 h-6 text-emerald-400" />
+                </div>
+                <div>
+                  <p className="text-white font-medium">Received</p>
+                  <p className="text-xs text-slate-400">Ref: {confirmedId.slice(0, 8)}</p>
+                </div>
+              </div>
+              <p className="text-sm text-slate-300 leading-relaxed">
+                Acharya Akash will verify your payment and reach out to schedule your session. To speed it up, share the details on WhatsApp too.
+              </p>
+              <a
+                data-testid="confirm-whatsapp"
+                href={confirmWhatsapp()}
+                target="_blank"
+                rel="noreferrer"
+                className="w-full inline-flex justify-center items-center gap-2 py-3 rounded-full bg-gold text-black hover:bg-amber-300 transition"
+              >
+                <MessageCircle className="w-4 h-4" /> Notify on WhatsApp
+              </a>
+              <Button
+                variant="outline"
+                onClick={() => setConfirmOpen(false)}
+                className="w-full rounded-full border-white/20 bg-transparent text-slate-100 hover:bg-white/5"
+              >
+                Close
+              </Button>
+            </div>
+          ) : (
+            <div className="space-y-4 py-2">
+              <div>
+                <Label className="text-slate-300 text-xs uppercase tracking-widest">Package</Label>
+                <p className="text-white mt-1">
+                  {packages.find(p => p.id === upiPkg)?.name} · ₹{packages.find(p => p.id === upiPkg)?.amount?.toLocaleString('en-IN')}
+                  <span className="text-slate-500 ml-2">· {modes[upiPkg] || "chat"} mode</span>
+                </p>
+              </div>
+              <div>
+                <Label className="text-slate-300">UTR / Reference number</Label>
+                <Input
+                  data-testid="confirm-utr"
+                  required
+                  value={confirm.utr}
+                  onChange={e => setConfirm({ ...confirm, utr: e.target.value })}
+                  placeholder="e.g. 424212345678"
+                  className="bg-black/40 border-white/10 mt-2 font-mono"
+                />
+                <p className="text-[11px] text-slate-500 mt-1">Find it in your bank app or the UPI success screen.</p>
+              </div>
+              <div>
+                <Label className="text-slate-300">Screenshot <span className="text-slate-500">(optional)</span></Label>
+                {confirm.screenshot ? (
+                  <div className="mt-2 flex items-center gap-3 p-3 rounded-xl bg-black/30 border border-white/10">
+                    <img src={confirm.screenshot} alt="preview" className="w-16 h-16 object-cover rounded-md" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-slate-300 truncate">{confirm.filename}</p>
+                      <p className="text-[11px] text-emerald-400">Ready to upload</p>
+                    </div>
+                    <button onClick={() => setConfirm(c => ({ ...c, screenshot: "", filename: "" }))} className="text-slate-400 hover:text-white">
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <label className="mt-2 block cursor-pointer">
+                    <input type="file" accept="image/*" onChange={handleFile} className="hidden" data-testid="confirm-screenshot" />
+                    <div className="rounded-xl border-2 border-dashed border-white/10 hover:border-amber-400/40 p-6 text-center text-slate-400 transition">
+                      <Upload className="w-5 h-5 mx-auto mb-2 text-amber-400/70" />
+                      <p className="text-sm">Tap to attach payment screenshot</p>
+                      <p className="text-[11px] text-slate-500 mt-1">JPG or PNG, up to 4MB</p>
+                    </div>
+                  </label>
+                )}
+              </div>
+              <div>
+                <Label className="text-slate-300">Note <span className="text-slate-500">(optional)</span></Label>
+                <Input
+                  data-testid="confirm-note"
+                  value={confirm.note}
+                  onChange={e => setConfirm({ ...confirm, note: e.target.value })}
+                  placeholder="Anything you'd like to add"
+                  className="bg-black/40 border-white/10 mt-2"
+                />
+              </div>
+              <DialogFooter>
+                <Button
+                  data-testid="confirm-submit"
+                  onClick={submitConfirm}
+                  disabled={submitting || !confirm.utr}
+                  className="w-full bg-gold text-black hover:bg-amber-300 rounded-full py-6 gold-glow"
+                >
+                  {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : "Submit for confirmation"}
+                </Button>
+              </DialogFooter>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

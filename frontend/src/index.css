@@ -6,25 +6,25 @@
 
 @layer base {
     :root {
-        --background: 240 45% 4%;
-        --foreground: 210 20% 98%;
-        --card: 240 35% 7%;
-        --card-foreground: 210 20% 98%;
-        --popover: 240 35% 7%;
-        --popover-foreground: 210 20% 98%;
-        --primary: 42 78% 55%;
-        --primary-foreground: 240 33% 3%;
-        --secondary: 240 25% 12%;
-        --secondary-foreground: 210 20% 98%;
-        --muted: 240 25% 12%;
-        --muted-foreground: 220 12% 68%;
-        --accent: 240 30% 15%;
-        --accent-foreground: 42 78% 65%;
-        --destructive: 0 62.8% 45%;
-        --destructive-foreground: 210 20% 98%;
-        --border: 240 30% 16%;
-        --input: 240 30% 15%;
-        --ring: 42 78% 55%;
+        --background: 242 55% 15%;
+        --foreground: 45 30% 96%;
+        --card: 244 40% 20%;
+        --card-foreground: 45 30% 96%;
+        --popover: 244 40% 20%;
+        --popover-foreground: 45 30% 96%;
+        --primary: 40 75% 55%;
+        --primary-foreground: 245 40% 12%;
+        --secondary: 245 30% 25%;
+        --secondary-foreground: 45 30% 96%;
+        --muted: 245 28% 22%;
+        --muted-foreground: 240 15% 78%;
+        --accent: 245 32% 28%;
+        --accent-foreground: 40 75% 68%;
+        --destructive: 0 70% 55%;
+        --destructive-foreground: 45 30% 96%;
+        --border: 245 30% 30%;
+        --input: 245 30% 25%;
+        --ring: 40 75% 55%;
         --radius: 0.75rem;
     }
 }
@@ -172,7 +172,7 @@
 .bg-gold    { background-color: #D4AF37; }
 
 .glass {
-    background: rgba(10, 10, 25, 0.55);
+    background: rgba(30, 23, 88, 0.55);
     backdrop-filter: blur(18px);
     -webkit-backdrop-filter: blur(18px);
     border: 1px solid rgba(255, 255, 255, 0.08);
