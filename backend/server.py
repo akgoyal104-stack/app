@@ -47,14 +47,14 @@ security = HTTPBearer(auto_error=False)
 PACKAGES: Dict[str, Dict[str, Any]] = {
     "basic_questions": {
         "name": "Basic Questions",
-        "amount": 499.0,
+        "amount": 299.0,
         "currency": "inr",
         "mode": "payment",
         "description": "A focused consultation with Acharya Akash. Both chat and call options available.",
     },
     "detailed_reading": {
         "name": "Detailed Reading",
-        "amount": 999.0,
+        "amount": 499.0,
         "currency": "inr",
         "mode": "payment",
         "description": "An in-depth Vedic reading with Acharya Akash. Both chat and call options available.",
