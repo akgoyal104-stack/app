@@ -184,7 +184,7 @@ export default function Landing() {
             {
               q: "I was sceptical of astrology till I met an engineer who took it seriously. He walked me through my Navamsa placements with the precision of a mathematician and the care of a family elder.",
               name: "Aditya Verma",
-              role: "Founder, Delhi",
+              role: "UPSC aspirant, Delhi",
             },
             {
               q: "The consultation felt less like a prediction and more like a conversation with a wise friend. His remedies were simple, practical, and rooted in tradition — not commercial.",
