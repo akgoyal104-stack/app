@@ -608,7 +608,7 @@ async def chat(req: ChatReq, user=Depends(get_current_user)):
     if history:
         past = "\n".join([f"{m['role'].upper()}: {m['content']}" for m in history[-10:]])
         context_prompt = f"Previous conversation:\n{past}\n\nCurrent question: {req.message}"
-   reply = "AI option has been disabled"
+    reply = "AI option has been disabled"
     await db.chat_messages.insert_one({
         "user_id": user["id"],
         "session_id": session_id,
