@@ -62,9 +62,9 @@ export default function Landing() {
             </div>
             <div className="relative rounded-3xl overflow-hidden border border-white/10 glass mt-8 md:mt-16 md:ml-16 max-w-md">
               <img
-                src="https://images.pexels.com/photos/36750427/pexels-photo-36750427.jpeg"
+                src="https://customer-assets-39nsmqrw.emergentagent.net/job_zodiac-portal-39/artifacts/2ah3y0f1_325274ac-8ed9-489d-9a14-d48ccf4e95f2.jpeg"
                 alt="Acharya Akash portrait"
-                className="w-full h-[440px] object-cover"
+                className="w-full h-[440px] object-cover object-top"
               />
               <div className="absolute bottom-0 inset-x-0 p-6 bg-gradient-to-t from-black/85 via-black/40 to-transparent">
                 <p className="text-xs uppercase tracking-[0.3em] font-mono text-amber-400/90">Acharya Akash</p>
@@ -151,6 +151,45 @@ export default function Landing() {
               <div className="text-xs text-slate-400 mt-1">UPSC Interviewed</div>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className="max-w-7xl mx-auto px-6 py-24 border-t border-white/5">
+        <p className="text-xs uppercase tracking-[0.3em] font-mono text-amber-500/80 mb-4">Voices of seekers</p>
+        <h2 className="text-4xl md:text-5xl font-serif-display font-light text-white tracking-tight mb-14">
+          What people <span className="text-gold italic">say</span>.
+        </h2>
+        <div className="grid md:grid-cols-3 gap-6">
+          {[
+            {
+              q: "Acharya Akash didn't just read my chart — he explained the exact Mahadasha shift that had turned my career upside down. Two weeks later I made the decision he'd guided me toward, and it worked.",
+              name: "Priya Ramesh",
+              role: "Product Manager, Bangalore",
+            },
+            {
+              q: "I was sceptical of astrology till I met an engineer who took it seriously. He walked me through my Navamsa placements with the precision of a mathematician and the care of a family elder.",
+              name: "Aditya Verma",
+              role: "Founder, Delhi",
+            },
+            {
+              q: "The consultation felt less like a prediction and more like a conversation with a wise friend. His remedies were simple, practical, and rooted in tradition — not commercial.",
+              name: "Meera Iyer",
+              role: "Doctor, Pune",
+            },
+          ].map((t, i) => (
+            <div
+              key={i}
+              className="glass border border-white/10 rounded-2xl p-8 hover:border-amber-400/30 transition"
+            >
+              <div className="text-4xl font-serif-display text-gold leading-none mb-4">"</div>
+              <p className="text-slate-200 leading-relaxed text-sm">{t.q}</p>
+              <div className="mt-6 pt-6 border-t border-white/5">
+                <p className="text-white font-serif-display text-base">{t.name}</p>
+                <p className="text-xs text-slate-500 mt-0.5">{t.role}</p>
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 

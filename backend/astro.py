@@ -30,6 +30,7 @@ DASHA_ORDER = ["Ketu", "Venus", "Sun", "Moon", "Mars", "Rahu", "Jupiter", "Satur
 
 NAK_SIZE = 360.0 / 27.0    # 13°20'
 PADA_SIZE = NAK_SIZE / 4   # 3°20'
+NAVAMSA_SIZE = 30.0 / 9.0  # 3°20'
 
 _geocoder = Nominatim(user_agent="acharya_akash_astro/1.0", timeout=10)
 _tzf = TimezoneFinder()
@@ -55,6 +56,33 @@ def _sign_details(long_deg: float) -> Tuple[int, float, int, int]:
     nak_pos = long_deg - nak_idx * NAK_SIZE
     pada = int(nak_pos // PADA_SIZE) + 1
     return sign_idx, deg_in_sign, nak_idx, pada
+
+
+def _navamsa_sign(long_deg: float) -> int:
+    """Return Navamsa (D9) sign index 0..11 for a planet at longitude."""
+    return int((long_deg % 360) // NAVAMSA_SIZE) % 12
+
+
+def _compute_antardasha(mahadasha: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """Given the running Mahadasha, split into 9 Antardashas in classic order."""
+    lord = mahadasha["lord"]
+    lord_years = mahadasha["years"]
+    start = datetime.fromisoformat(mahadasha["start"]).replace(tzinfo=pytz.UTC)
+    start_idx = DASHA_ORDER.index(lord)
+    antar_list: List[Dict[str, Any]] = []
+    cursor = start
+    for i in range(9):
+        sub = DASHA_ORDER[(start_idx + i) % 9]
+        duration_years = (lord_years * DASHA_YEARS[sub]) / 120.0
+        end = cursor + timedelta(days=duration_years * 365.25)
+        antar_list.append({
+            "lord": sub,
+            "start": cursor.date().isoformat(),
+            "end": end.date().isoformat(),
+            "years": round(duration_years, 2),
+        })
+        cursor = end
+    return antar_list
 
 
 def compute_chart(date_str: str, time_str: str, place: str) -> Dict[str, Any]:
@@ -90,6 +118,7 @@ def compute_chart(date_str: str, time_str: str, place: str) -> Dict[str, Any]:
         p = raw_pos[name]
         s_idx, d_in_s, n_idx, pada = _sign_details(p["longitude"])
         house = ((s_idx - asc_sign_idx) % 12) + 1
+        navamsa_idx = _navamsa_sign(p["longitude"])
         planet_data.append({
             "name": name,
             "sign": SIGNS[s_idx],
@@ -97,8 +126,30 @@ def compute_chart(date_str: str, time_str: str, place: str) -> Dict[str, Any]:
             "house": house,
             "nakshatra": NAKSHATRAS[n_idx],
             "pada": pada,
+            "navamsa_sign": SIGNS[navamsa_idx],
             "retrograde": (name not in {"Rahu", "Ketu"}) and (p["speed"] < 0),
         })
+
+    # Navamsa (D9) chart — Ascendant navamsa becomes the D9 lagna
+    d9_asc_idx = _navamsa_sign(asc_lon)
+    d9_planets = []
+    for pd in planet_data:
+        p_navamsa_idx = SIGNS.index(pd["navamsa_sign"])
+        d9_house = ((p_navamsa_idx - d9_asc_idx) % 12) + 1
+        d9_planets.append({"name": pd["name"], "sign": pd["navamsa_sign"], "house": d9_house})
+    d9_houses = []
+    for h in range(1, 13):
+        s_idx = (d9_asc_idx + h - 1) % 12
+        d9_houses.append({
+            "house": h,
+            "sign": SIGNS[s_idx],
+            "planets": [p["name"] for p in d9_planets if p["house"] == h],
+        })
+    navamsa_chart = {
+        "ascendant_sign": SIGNS[d9_asc_idx],
+        "planets": d9_planets,
+        "houses": d9_houses,
+    }
 
     houses: List[Dict[str, Any]] = []
     for h in range(1, 13):
@@ -140,6 +191,18 @@ def compute_chart(date_str: str, time_str: str, place: str) -> Dict[str, Any]:
             current_dasha = d
             break
 
+    # Antardasha (sub-period) within current Mahadasha
+    antardashas: List[Dict[str, Any]] = []
+    current_antar: Optional[Dict[str, Any]] = None
+    if current_dasha:
+        antardashas = _compute_antardasha(current_dasha)
+        for a in antardashas:
+            a_start = datetime.fromisoformat(a["start"]).replace(tzinfo=pytz.UTC)
+            a_end = datetime.fromisoformat(a["end"]).replace(tzinfo=pytz.UTC)
+            if a_start <= now_utc < a_end:
+                current_antar = a
+                break
+
     return {
         "birth_details": {
             "date": date_str, "time": time_str, "place": place,
@@ -157,7 +220,10 @@ def compute_chart(date_str: str, time_str: str, place: str) -> Dict[str, Any]:
         "sun_sign": next(p["sign"] for p in planet_data if p["name"] == "Sun"),
         "planets": planet_data,
         "houses": houses,
+        "navamsa": navamsa_chart,
         "current_mahadasha": current_dasha,
+        "current_antardasha": current_antar,
+        "antardashas": antardashas,
         "dasha_timeline": timeline[:6],
         "ayanamsa": "Lahiri",
         "house_system": "Whole Sign",
@@ -186,4 +252,13 @@ def chart_summary_for_llm(chart: Dict[str, Any]) -> str:
         d = chart["current_mahadasha"]
         lines.append("")
         lines.append(f"Current Vimshottari Mahadasha: {d['lord']} ({d['start']} → {d['end']})")
+    if chart.get("current_antardasha"):
+        a = chart["current_antardasha"]
+        lines.append(f"Current Antardasha (sub-period): {a['lord']} ({a['start']} → {a['end']})")
+    if chart.get("navamsa"):
+        nv = chart["navamsa"]
+        lines.append("")
+        lines.append(f"Navamsa (D9) Lagna: {nv['ascendant_sign']}")
+        for p in nv["planets"]:
+            lines.append(f"  D9 · {p['name']}: {p['sign']} (D9 House {p['house']})")
     return "\n".join(lines)

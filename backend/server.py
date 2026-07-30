@@ -118,6 +118,7 @@ class ChatReq(BaseModel):
 class CheckoutReq(BaseModel):
     package_id: str
     origin_url: str
+    consultation_mode: Optional[str] = None  # "chat" | "call"
 
 # ================= Helpers =================
 def hash_password(p: str) -> str:
@@ -272,12 +273,14 @@ async def birth_chart(req: BirthDetails, user=Depends(get_current_user)):
     chart_facts = chart_summary_for_llm(chart)
     system = (
         "You are Acharya Akash, Gold Medalist Vedic astrologer from KN Rao's institute (BVB, New Delhi). "
-        "You are given the ACCURATE computed Vedic chart data (Lahiri ayanamsa, Whole Sign houses). "
+        "You are given the ACCURATE computed Vedic chart data (Lahiri ayanamsa, Whole Sign houses, "
+        "including Navamsa D9 and current Antardasha). "
         "Interpret ONLY from these exact placements — do not invent different positions. "
         "Structure the response in clear sections using markdown headings: "
         "## Lagna & Personality, ## Moon Nakshatra & Mind, ## Key Planetary Yogas, "
+        "## Navamsa (D9) — Marriage & Dharma, "
         "## Career & Purpose, ## Relationships & Family, ## Wealth & Health, "
-        "## Current Vimshottari Mahadasha, ## Remedies & Guidance. "
+        "## Current Mahadasha–Antardasha Guidance, ## Remedies. "
         "Keep each section 2-4 sentences. Be specific, cite the actual houses/signs from the data."
     )
     prompt = (
@@ -556,6 +559,31 @@ async def chat_messages(session_id: str, user=Depends(get_current_user)):
     return {"messages": msgs}
 
 # ================= Payments =================
+UPI_ID = "akgoyal104@okicici"
+UPI_PAYEE_NAME = "Acharya Akash"
+
+@api_router.get("/payments/upi")
+async def upi_info(package_id: Optional[str] = None):
+    amount = None
+    if package_id and package_id in PACKAGES:
+        amount = PACKAGES[package_id]["amount"]
+    # Build UPI intent link (upi://pay?...) — opens directly in any UPI app on mobile
+    from urllib.parse import quote
+    params = f"pa={UPI_ID}&pn={quote(UPI_PAYEE_NAME)}&cu=INR"
+    if amount:
+        params += f"&am={amount:.2f}"
+        params += f"&tn={quote(PACKAGES[package_id]['name'])}"
+    upi_url = f"upi://pay?{params}"
+    # Free QR generator (no dependency, no API key needed)
+    qr_url = f"https://api.qrserver.com/v1/create-qr-code/?size=280x280&margin=10&data={quote(upi_url)}"
+    return {
+        "upi_id": UPI_ID,
+        "payee_name": UPI_PAYEE_NAME,
+        "amount": amount,
+        "upi_url": upi_url,
+        "qr_url": qr_url,
+    }
+
 @api_router.get("/payments/packages")
 async def get_packages():
     return {"packages": [{"id": k, **v} for k, v in PACKAGES.items()]}
@@ -565,6 +593,7 @@ async def create_checkout(req: CheckoutReq, request: Request, user=Depends(get_c
     if req.package_id not in PACKAGES:
         raise HTTPException(400, "Invalid package")
     pkg = PACKAGES[req.package_id]
+    consultation_mode = req.consultation_mode if req.consultation_mode in {"chat", "call"} else "chat"
     host_url = str(request.base_url)
     webhook_url = f"{host_url.rstrip('/')}/api/webhook/stripe"
     stripe_checkout = StripeCheckout(api_key=STRIPE_API_KEY, webhook_url=webhook_url)
@@ -579,6 +608,7 @@ async def create_checkout(req: CheckoutReq, request: Request, user=Depends(get_c
             "user_id": user["id"],
             "package_id": req.package_id,
             "mode": pkg["mode"],
+            "consultation_mode": consultation_mode,
         },
     )
     session = await stripe_checkout.create_checkout_session(session_req)
@@ -589,6 +619,7 @@ async def create_checkout(req: CheckoutReq, request: Request, user=Depends(get_c
         "amount": float(pkg["amount"]),
         "currency": pkg["currency"],
         "mode": pkg["mode"],
+        "consultation_mode": consultation_mode,
         "status": "initiated",
         "payment_status": "pending",
         "created_at": datetime.now(timezone.utc).isoformat(),

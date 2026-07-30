@@ -266,17 +266,47 @@ export default function BirthChart() {
 
                   {cdata.current_mahadasha && (
                     <div className="bg-gradient-to-br from-amber-500/10 to-transparent rounded-xl p-4 border border-amber-400/20 mb-6">
-                      <p className="text-[10px] uppercase tracking-widest text-amber-500/70">Current Vimshottari Mahadasha</p>
-                      <p className="font-serif-display text-xl text-gold mt-1" data-testid="chart-dasha">{cdata.current_mahadasha.lord}</p>
-                      <p className="text-xs text-slate-400 mt-1">
-                        {cdata.current_mahadasha.start} → {cdata.current_mahadasha.end} · {cdata.current_mahadasha.years} yrs
-                      </p>
+                      <div className="flex flex-wrap gap-6">
+                        <div className="flex-1 min-w-[180px]">
+                          <p className="text-[10px] uppercase tracking-widest text-amber-500/70">Mahadasha</p>
+                          <p className="font-serif-display text-xl text-gold mt-1" data-testid="chart-dasha">{cdata.current_mahadasha.lord}</p>
+                          <p className="text-xs text-slate-400 mt-1">
+                            {cdata.current_mahadasha.start} → {cdata.current_mahadasha.end} · {cdata.current_mahadasha.years} yrs
+                          </p>
+                        </div>
+                        {cdata.current_antardasha && (
+                          <div className="flex-1 min-w-[180px] border-l border-white/10 pl-6">
+                            <p className="text-[10px] uppercase tracking-widest text-amber-500/70">Antardasha</p>
+                            <p className="font-serif-display text-xl text-white mt-1" data-testid="chart-antardasha">
+                              {cdata.current_mahadasha.lord}–{cdata.current_antardasha.lord}
+                            </p>
+                            <p className="text-xs text-slate-400 mt-1">
+                              {cdata.current_antardasha.start} → {cdata.current_antardasha.end}
+                            </p>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   )}
 
                   <ChartVisual data={cdata} />
                 </CardContent>
               </Card>
+
+              {cdata.navamsa && (
+                <Card className="glass border-white/10">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between flex-wrap mb-3">
+                      <h3 className="text-lg font-serif-display text-white">Navamsa (D9) Chart</h3>
+                      <p className="text-[11px] text-slate-500">D9 Lagna: <span className="text-gold">{cdata.navamsa.ascendant_sign}</span></p>
+                    </div>
+                    <p className="text-xs text-slate-500 mb-4">
+                      The divisional chart for marriage, dharma and the inner soul. Read alongside the D1.
+                    </p>
+                    <ChartVisual data={cdata.navamsa} />
+                  </CardContent>
+                </Card>
+              )}
 
               <Card className="glass border-white/10">
                 <CardContent className="p-6">
