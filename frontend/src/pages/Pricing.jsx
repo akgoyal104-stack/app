@@ -194,7 +194,7 @@ export default function Pricing() {
                   disabled={loading === p.id}
                   className={`w-full rounded-full py-6 ${highlight ? "bg-gold text-black hover:bg-amber-300 gold-glow" : "bg-white/10 hover:bg-white/20 text-white"}`}
                 >
-                  {*/loading === p.id ? <Loader2 className="w-4 h-4 animate-spin" /> : `Book — ₹${p.amount.toLocaleString('en-IN')*/}`}
+                  {loading === p.id ? <Loader2 className="w-4 h-4 animate-spin" /> : `Book — ₹${p.amount.toLocaleString('en-IN')}`}
                 </Button>
               </CardContent>
             </Card>
