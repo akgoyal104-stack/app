@@ -188,14 +188,14 @@ def sun_sign_from_date(dob: str) -> str:
             return name
     return "Capricorn"
 
-async def call_llm(system: str, user_msg: str, session_id: str) -> str:
-    chat = LlmChat(
-        api_key=EMERGENT_LLM_KEY,
-        session_id=session_id,
-        system_message=system,
-    ).with_model("anthropic", "claude-sonnet-4-5-20250929")
-    resp = await chat.send_message(UserMessage(text=user_msg))
-    return resp
+#async def call_llm(system: str, user_msg: str, session_id: str) -> str:
+    #chat = LlmChat(
+        #api_key=EMERGENT_LLM_KEY,
+        #session_id=session_id,
+        #system_message=system,
+   # ).with_model("anthropic", "claude-sonnet-4-5-20250929")
+   # resp = await chat.send_message(UserMessage(text=user_msg))
+   # return resp
 
 # ================= Auth =================
 @api_router.post("/auth/signup")
