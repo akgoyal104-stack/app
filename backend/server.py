@@ -329,7 +329,7 @@ async def get_horoscope(sign: str, period: str = "daily"):
         "Return ONLY the reading text, 4-6 sentences, no preamble."
     )
     prompt = f"Write a {period} horoscope for {sign_norm} for {today}. Include a lucky color and a lucky number."
-    text = NA
+    text = "AI Option has been disabled"
     doc = {
         "sign": sign_norm,
         "period": period,
@@ -518,7 +518,7 @@ async def compatibility(req: CompatibilityReq):
         "## Long-term Prospects, ## Challenges, ## Advice. Be honest and warm."
     )
     prompt = f"Analyse Vedic compatibility between {a} and {b}."
-    text = NA
+    text = "AI Option has been disabled"
     return {"sign_a": a, "sign_b": b, "analysis": text}
 
 # ================= AI Chat =================
@@ -608,7 +608,7 @@ async def chat(req: ChatReq, user=Depends(get_current_user)):
     if history:
         past = "\n".join([f"{m['role'].upper()}: {m['content']}" for m in history[-10:]])
         context_prompt = f"Previous conversation:\n{past}\n\nCurrent question: {req.message}"
-   reply = NA
+   reply = "AI option has been disabled"
     await db.chat_messages.insert_one({
         "user_id": user["id"],
         "session_id": session_id,
