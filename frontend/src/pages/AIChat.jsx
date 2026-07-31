@@ -87,7 +87,7 @@ export default function AIChat() {
       setStreamed("");
       loadSessions();
     } catch (err) {
-      toast.error("Could not send message");
+      toast.error("This feature is not enabled yet, please consult Acharya for indepth details");
       setMessages(prev => prev.slice(0, -1));
     } finally {
       setSending(false);
