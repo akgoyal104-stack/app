@@ -44,8 +44,8 @@ export default function Landing() {
               <span className="text-gold italic font-medium">modern clarity.</span>
             </h1>
             <p className="mt-8 text-lg leading-relaxed text-slate-300 max-w-lg">
-              Consultations with <span className="text-gold">Acharya Akash</span> — Gold Medalist from KN Rao's institute
-              at Bhartiya Vidya Bhavan, New Delhi. Graduate of NIT Jaipur. UPSC IAS interview candidate.
+              Consultations with <span className="text-gold">Acharya Akash</span> — Gold Medalist from KN Rao's Institute of Astrology
+              , Bhartiya Vidya Bhavan, New Delhi. Graduate of NIT Jaipur. UPSC IAS interview candidate.
               A rare blend of tradition and rigour.
             </p>
             <div className="mt-10 flex flex-wrap gap-3">
