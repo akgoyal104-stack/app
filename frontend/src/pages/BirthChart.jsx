@@ -11,7 +11,7 @@ const SIGN_SYMBOL = {
   Aries: "♈", Taurus: "♉", Gemini: "♊", Cancer: "♋", Leo: "♌", Virgo: "♍",
   Libra: "♎", Scorpio: "♏", Sagittarius: "♐", Capricorn: "♑", Aquarius: "♒", Pisces: "♓",
 };
-
+ 
 function renderMarkdown(text = "") {
   const html = text
     .replace(/^## (.*)$/gm, '<h2>$1</h2>')
