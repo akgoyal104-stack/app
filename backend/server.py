@@ -523,7 +523,7 @@ async def birth_chart(req: BirthDetails, user=Depends(get_current_user)):
         f"COMPUTED CHART DATA (interpret this):\n{chart_facts}\n\n"
         "Write a detailed Vedic natal chart reading grounded strictly in these placements."
     )
-    reading = "NA"
+    reading = "This feauture is not available right now, consult the Acharya directly for indepth analysis of your Kundali"
     chart_id = str(uuid.uuid4())
     doc = {
         "id": chart_id,
