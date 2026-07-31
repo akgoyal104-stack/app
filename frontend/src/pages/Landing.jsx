@@ -110,9 +110,9 @@ export default function Landing() {
         </div>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {[
-            { icon: Sun, title: "Daily Horoscopes", desc: "AI-augmented Vedic readings, refreshed each morning.", to: "/horoscopes" },
-            { icon: Compass, title: "Birth Chart", desc: "Detailed Kundali analysis with a downloadable PDF.", to: "/birth-chart" },
-            { icon: Moon, title: "Compatibility", desc: "Guna Milan style compatibility for any pair.", to: "/compatibility" },
+            { icon: Sun, title: "Daily Horoscopes", desc: "AI-augmented Vedic readings", to: "/horoscopes" },
+            { icon: Compass, title: "Birth Chart", desc: "Detailed Kundali analysis", to: "/birth-chart" },
+            { icon: Moon, title: "Compatibility", desc: "Guna Milan style compatibility for any pair", to: "/compatibility" },
             { icon: MessageCircle, title: "AI Astrologer", desc: "Ask anything — streaming replies in Acharya's voice.", to: "/ai-astrologer" },
           ].map(({ icon: Icon, title, desc, to }, i) => (
             <Link
