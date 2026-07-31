@@ -84,7 +84,7 @@ function ChartVisual({ data }) {
           vectorEffect="non-scaling-stroke"
         />
 
-        {/* Internal North Indian diamond lines: each line is drawn once */}
+        {/* Internal North Indian diamond chart: each line is drawn once */}
         <path
           d={NORTH_INDIAN_INTERNAL_LINES}
           fill="none"
