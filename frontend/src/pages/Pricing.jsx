@@ -188,6 +188,7 @@ export default function Pricing() {
                     </li>
                   ))}
                 </ul>
+               {false && (
                 <Button
                   data-testid={`buy-${p.id}`}
                   onClick={() => buy(p.id)}
@@ -196,6 +197,8 @@ export default function Pricing() {
                 >
                   {loading === p.id ? <Loader2 className="w-4 h-4 animate-spin" /> : `Book — ₹${p.amount.toLocaleString('en-IN')}`}
                 </Button>
+              )
+               }
               </CardContent>
             </Card>
           );
