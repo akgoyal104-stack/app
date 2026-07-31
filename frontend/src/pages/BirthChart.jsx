@@ -21,7 +21,7 @@ function renderMarkdown(text = "") {
   return { __html: html };
 }
 
-function ChartVisual({ data }) {
+#function ChartVisual({ data }) {
   // North Indian style diamond chart (4x4 grid). Houses 1..12 fixed positions.
   // 1=top center, then clockwise
   const positions = {
@@ -68,6 +68,156 @@ function ChartVisual({ data }) {
           );
         })}
       </div>
+    </div>
+  );
+}
+
+const NORTH_INDIAN_HOUSE_SHAPES = [
+  { house: 1, points: "200,200 105,105 200,20 295,105", x: 200, y: 66 },
+  { house: 2, points: "20,20 200,20 105,105", x: 108, y: 50 },
+  { house: 3, points: "20,20 20,200 105,105", x: 54, y: 108 },
+  { house: 4, points: "20,200 105,105 200,200 105,295", x: 108, y: 201 },
+  { house: 5, points: "20,200 20,380 105,295", x: 54, y: 292 },
+  { house: 6, points: "20,380 200,380 105,295", x: 108, y: 350 },
+  { house: 7, points: "200,200 105,295 200,380 295,295", x: 200, y: 294 },
+  { house: 8, points: "200,380 380,380 295,295", x: 292, y: 350 },
+  { house: 9, points: "380,380 380,200 295,295", x: 346, y: 292 },
+  { house: 10, points: "380,200 295,295 200,200 295,105", x: 292, y: 201 },
+  { house: 11, points: "380,200 380,20 295,105", x: 346, y: 108 },
+  { house: 12, points: "380,20 200,20 295,105", x: 292, y: 50 },
+];
+
+function ChartVisual({ data }) {
+  const houses = data?.houses || [];
+  const houseByNumber = new Map(
+    houses.map((house) => [Number(house.house), house])
+  );
+
+  return (
+    <div className="relative w-full aspect-square max-w-md mx-auto">
+      <svg
+        viewBox="0 0 400 400"
+        className="w-full h-full rounded-xl"
+        role="img"
+        aria-label="North Indian Vedic birth chart"
+      >
+        <rect
+          x="20"
+          y="20"
+          width="360"
+          height="360"
+          fill="rgba(0,0,0,0.4)"
+          stroke="rgba(251,191,36,0.55)"
+          strokeWidth="2"
+        />
+
+        {NORTH_INDIAN_HOUSE_SHAPES.map((shape) => {
+          const house = houseByNumber.get(shape.house);
+          const planetNames = (house?.planets || []).map((planet) =>
+            String(planet).slice(0, 2)
+          );
+          const planetLines = [];
+
+          for (let i = 0; i < planetNames.length; i += 3) {
+            planetLines.push(planetNames.slice(i, i + 3).join(" "));
+          }
+
+          const signSymbol = house
+            ? SIGN_SYMBOL?.[house.sign] || ""
+            : "";
+
+          const isKendra = [1, 4, 7, 10].includes(shape.house);
+
+          return (
+            <g key={shape.house}>
+              <polygon
+                points={shape.points}
+                fill={isKendra ? "rgba(245,158,11,0.14)" : "rgba(245,158,11,0.04)"}
+                stroke="rgba(251,191,36,0.45)"
+                strokeWidth="1.5"
+              />
+
+              <text
+                x={shape.x}
+                y={shape.y - 20}
+                textAnchor="middle"
+                fill="rgba(251,191,36,0.75)"
+                fontSize="10"
+                fontFamily="monospace"
+              >
+                H{shape.house}
+              </text>
+
+              {house && (
+                <>
+                  <text
+                    x={shape.x}
+                    y={shape.y - 6}
+                    textAnchor="middle"
+                    fill="#fcd34d"
+                    fontSize="12"
+                    fontWeight="600"
+                  >
+                    {signSymbol} {house.sign}
+                  </text>
+
+                  <text
+                    x={shape.x}
+                    y={shape.y + 12}
+                    textAnchor="middle"
+                    fill="#e2e8f0"
+                    fontSize="11"
+                    fontFamily="monospace"
+                  >
+                    {planetLines.map((line, index) => (
+                      <tspan
+                        key={`${shape.house}-${index}`}
+                        x={shape.x}
+                        dy={index === 0 ? 0 : 14}
+                      >
+                        {line}
+                      </tspan>
+                    ))}
+                  </text>
+                </>
+              )}
+
+              {shape.house === 1 && (
+                <text
+                  x={shape.x}
+                  y={shape.y + 38}
+                  textAnchor="middle"
+                  fill="rgba(251,191,36,0.6)"
+                  fontSize="9"
+                  fontStyle="italic"
+                >
+                  Lagna
+                </text>
+              )}
+            </g>
+          );
+        })}
+
+        <circle
+          cx="200"
+          cy="200"
+          r="4"
+          fill="#fbbf24"
+          stroke="#78350f"
+          strokeWidth="1"
+        />
+
+        <text
+          x="200"
+          y="196"
+          textAnchor="middle"
+          fill="rgba(251,191,36,0.35)"
+          fontSize="10"
+          fontStyle="italic"
+        >
+          Kundali
+        </text>
+      </svg>
     </div>
   );
 }
