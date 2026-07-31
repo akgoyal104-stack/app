@@ -261,6 +261,7 @@ export default function Pricing() {
                 >
                   <Copy className="w-4 h-4 mr-2" /> Copy UPI ID
                 </Button>
+                
                 {false && (<a
                   data-testid="upi-open-btn"
                   href={upi?.upi_url || "#"}
