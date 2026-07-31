@@ -385,7 +385,7 @@ async def get_horoscope(sign: str, period: str = "daily"):
         "Return ONLY the reading text, 4-6 sentences, no preamble."
     )
     prompt = f"Write a {period} horoscope for {sign_norm} for {today}. Include a lucky color and a lucky number."
-    text = "AI Option has been disabled"
+    text = HOROSCOPE_TEXT[sign_norm][period],
     doc = {
         "sign": sign_norm,
         "period": period,
