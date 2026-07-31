@@ -643,7 +643,7 @@ async def chat_messages(session_id: str, user=Depends(get_current_user)):
 
 # ================= Payments =================
 UPI_ID = "akgoyal104@okicici"
-UPI_PAYEE_NAME = "Acharya Akash"
+UPI_PAYEE_NAME = "Akash Goyal"
 
 @api_router.get("/payments/upi")
 async def upi_info(package_id: Optional[str] = None):
