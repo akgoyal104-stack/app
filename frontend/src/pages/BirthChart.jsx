@@ -329,6 +329,7 @@ export default function BirthChart() {
                       </p>
                       <p className="text-xs text-slate-500 mt-0.5">{result.place_of_birth} • {cdata.birth_details.timezone}</p>
                     </div>
+                   {false && (
                     <Button
                       data-testid="chart-pdf-download"
                       size="sm"
@@ -337,6 +338,7 @@ export default function BirthChart() {
                     >
                       <Download className="w-3 h-3 mr-1" /> Download PDF
                     </Button>
+              )}
                   </div>
 
                   <div className="grid grid-cols-3 gap-3 mb-6">
