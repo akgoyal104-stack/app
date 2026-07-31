@@ -119,10 +119,14 @@ export default function Landing() {
 
     <p className="mt-3 text-center text-xs text-white/50">
       Swipe left or right to view images
-    </p>
+     </p>
   </div>
-</div>    
+</div>
+</div>
 </section>
+</div>
+  );
+}
       {/* Marquee */}
       <div className="border-y border-white/10 py-6 overflow-hidden bg-black/20 backdrop-blur-sm">
         <div className="marquee-track">
