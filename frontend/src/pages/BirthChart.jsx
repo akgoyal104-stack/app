@@ -506,8 +506,6 @@ function ChartVisual({ data }) {
   );
 }
 
-export default ChartVisual;
-
 function PlanetsTable({ planets }) {
   return (
     <div className="overflow-x-auto rounded-xl border border-white/10">
