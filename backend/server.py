@@ -669,7 +669,7 @@ async def compatibility(req: CompatibilityReq):
         "## Long-term Prospects, ## Challenges, ## Advice. Be honest and warm."
     )
     prompt = f"Analyse Vedic compatibility between {a} and {b}."
-    text = "AI Option has been disabled"
+    text = "This feauture is not available right now, please consult Acharya for indepth Kundali Milan"
     return {"sign_a": a, "sign_b": b, "analysis": text}
 
 # ================= AI Chat =================
