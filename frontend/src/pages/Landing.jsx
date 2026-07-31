@@ -113,7 +113,7 @@ export default function Landing() {
             { icon: Sun, title: "Daily Horoscopes", desc: "AI-augmented Vedic readings", to: "/horoscopes" },
             { icon: Compass, title: "Birth Chart", desc: "Detailed Kundali analysis", to: "/birth-chart" },
             { icon: Moon, title: "Compatibility", desc: "Guna Milan style compatibility for any pair", to: "/compatibility" },
-            { icon: MessageCircle, title: "AI Astrologer", desc: "Ask anything — streaming replies in Acharya's voice.", to: "/ai-astrologer" },
+            { icon: MessageCircle, title: "AI Astrologer", desc: "Ask anything", to: "/ai-astrologer" },
           ].map(({ icon: Icon, title, desc, to }, i) => (
             <Link
               key={i}
