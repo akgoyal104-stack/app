@@ -388,7 +388,7 @@ if period_norm not in {"daily", "weekly", "monthly"}:
     #cached = await db.horoscopes.find_one(
        # {"sign": sign_norm, "period": period, "cache_key": cache_key},
         #{"_id": 0},
-    )
+  #  )
    # if cached:
        # return cached
    # system = (
