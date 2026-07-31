@@ -64,7 +64,7 @@ export default function Pricing() {
       "Chat option available",
       "Call option available",
       "In-depth planetary analysis",
-      "Career • love • health guidance",
+      "In depth • Marriage • Career • love • health guidance",
       "Remedies rooted in tradition",
     ],
   };
