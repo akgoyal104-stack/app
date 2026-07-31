@@ -91,67 +91,176 @@ ZODIAC_SIGNS = [
     "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"
 ]
 HOROSCOPE_TEXT = {
-    "Aries": {
-        "daily": "Take initiative today, but pause before reacting to small frustrations. A practical conversation can open a useful opportunity. Keep your focus on one important task rather than scattering your energy. Lucky color: red. Lucky number: 9.",
-        "weekly": "This week favors decisive action and fresh starts. Your confidence will attract attention, but patience will help you turn interest into lasting progress. Make time for rest before committing to another responsibility. Lucky color: orange. Lucky number: 1.",
-        "monthly": "This month encourages you to lead with clarity rather than urgency. Career and personal goals can move forward when you establish realistic milestones and communicate them directly. Relationships benefit from listening before offering solutions. Lucky color: crimson. Lucky number: 18.",
+  "Aries": {
+        "daily": (
+            "With Aries as your Moon sign, feelings may rise quickly and push you toward immediate action. "
+            "Move your body, speak plainly, and pause before reacting; patience will protect your peace today."
+        ),
+        "weekly": (
+            "This week favors initiative, but emotional reactions may move faster than the facts. "
+            "Start the task you have been postponing, while allowing other people their own pace and perspective."
+        ),
+        "monthly": (
+            "This month asks you to turn courage into emotional steadiness. "
+            "Choose one priority, repair conversations quickly, and treat rest as part of your strength."
+        ),
     },
     "Taurus": {
-        "daily": "Your Taurus daily text...",
-        "weekly": "Your Taurus weekly text...",
-        "monthly": "Your Taurus monthly text...",
+        "daily": (
+            "With Taurus Moon, you seek emotional security through familiar people, routines, and tangible results. "
+            "Enjoy stability today, but stay open to a small change that makes life lighter."
+        ),
+        "weekly": (
+            "A steady week is ahead when you keep practical promises to yourself. "
+            "Review spending, home responsibilities, and health routines without allowing stubbornness to create distance."
+        ),
+        "monthly": (
+            "This month supports rebuilding inner security from the inside out. "
+            "Simplify your surroundings, make a realistic financial choice, and practise flexibility with people close to you."
+        ),
     },
-        "Gemini": {
-        "daily": "Your Gemini daily text...",
-        "weekly": "Your Taurus weekly text...",
-        "monthly": "Your Taurus monthly text...",
+    "Gemini": {
+        "daily": (
+            "With Gemini Moon, your mind may seek conversation, variety, and constant new input. "
+            "Capture your ideas, but protect your attention by finishing one important task before starting another."
+        ),
+        "weekly": (
+            "This week brings useful messages and opportunities to learn, though scattered thinking could drain you. "
+            "Ask clear questions, avoid incomplete information, and give important conversations a calm second look."
+        ),
+        "monthly": (
+            "This month is favourable for study, writing, networking, and refreshing your perspective. "
+            "Your emotional balance will improve when you limit distractions and create quiet time for focused thinking."
+        ),
     },
-        "Cancer": {
-        "daily": "Your Taurus daily text...",
-        "weekly": "Your Taurus weekly text...",
-        "monthly": "Your Taurus monthly text...",
+    "Cancer": {
+        "daily": (
+            "With Cancer Moon, your emotional world is sensitive to tone, memory, and the atmosphere around you. "
+            "Care for yourself as thoughtfully as you care for others, and do not assume every mood is yours to fix."
+        ),
+        "weekly": (
+            "Home and family matters deserve attention this week, but healthy boundaries matter just as much. "
+            "Offer support without absorbing everyone else's anxiety, and express your needs before resentment builds."
+        ),
+        "monthly": (
+            "This month encourages emotional renewal and a stronger sense of belonging. "
+            "Reconnect with a trusted person, improve your home routine, and allow old worries to soften."
+        ),
     },
-        "Leo": {
-        "daily": "Your Taurus daily text...",
-        "weekly": "Your Taurus weekly text...",
-        "monthly": "Your Taurus monthly text...",
+    "Leo": {
+        "daily": (
+            "With Leo Moon, you need warmth, appreciation, and room to express your heart. "
+            "Let your creativity lead today, while remembering that your self-worth does not depend on immediate praise."
+        ),
+        "weekly": (
+            "This week favours visibility, creative work, and generous leadership. "
+            "Invite others into the conversation, because listening will make your confidence feel supportive rather than overwhelming."
+        ),
+        "monthly": (
+            "This month asks you to balance personal radiance with emotional humility. "
+            "Celebrate your progress, share credit freely, and choose relationships where you can be sincere."
+        ),
     },
-      "Virgo": {
-        "daily": "Your Taurus daily text...",
-        "weekly": "Your Taurus weekly text...",
-        "monthly": "Your Taurus monthly text...",
+    "Virgo": {
+        "daily": (
+            "With Virgo Moon, your mind may look for problems to solve before it allows you to relax. "
+            "Use your practical judgment today, but replace harsh self-criticism with one measurable improvement."
+        ),
+        "weekly": (
+            "Organization will reduce emotional noise this week. "
+            "Sort priorities, delegate where possible, and resist turning a minor mistake into a judgment about your ability."
+        ),
+        "monthly": (
+            "This month is about creating systems that support wellbeing rather than pursuing exhausting perfection. "
+            "Improve sleep, work, and money routines gradually, and make time for activities with no productive outcome."
+        ),
     },
-        "Libra": {
-        "daily": "Your Taurus daily text...",
-        "weekly": "Your Taurus weekly text...",
-        "monthly": "Your Taurus monthly text...",
+    "Libra": {
+        "daily": (
+            "With Libra Moon, peace and fairness are important to your emotional wellbeing. "
+            "Keep the atmosphere pleasant today, but do not hide your real preference merely to avoid disagreement."
+        ),
+        "weekly": (
+            "Relationship conversations can become more balanced this week when you speak directly and listen carefully. "
+            "Make decisions from your priorities rather than waiting for everyone to approve."
+        ),
+        "monthly": (
+            "This month highlights partnership, cooperation, and the need for clear boundaries. "
+            "You can preserve harmony without carrying the full emotional workload; choose honest agreements over uncertainty."
+        ),
     },
-        "Scorpio": {
-        "daily": "Your Taurus daily text...",
-        "weekly": "Your Taurus weekly text...",
-        "monthly": "Your Taurus monthly text...",
+    "Scorpio": {
+        "daily": (
+            "With Scorpio Moon, emotions may run deep even when your words remain measured. "
+            "Trust your perception, but check assumptions before assigning motives to someone who seems quiet or distant."
+        ),
+        "weekly": (
+            "This week supports honest reflection and releasing stored resentment. "
+            "Protect your privacy, verify important information, and choose a direct conversation instead of testing trust indirectly."
+        ),
+        "monthly": (
+            "This month brings an opportunity for emotional transformation through simpler, steadier habits. "
+            "Release an outdated attachment, strengthen your boundaries, and allow trusted people to see your softer side."
+        ),
     },
-        "Sagittarius": {
-        "daily": "Your Taurus daily text...",
-        "weekly": "Your Taurus weekly text...",
-        "monthly": "Your Taurus monthly text...",
+    "Sagittarius": {
+        "daily": (
+            "With Sagittarius Moon, emotional wellbeing grows through freedom, truth, learning, and possibility. "
+            "Follow your curiosity today, but do not promise more than your time and energy can deliver."
+        ),
+        "weekly": (
+            "A lively week favours travel planning, study, and fresh ideas. "
+            "Keep your enthusiasm grounded by completing existing commitments before adding another exciting project."
+        ),
+        "monthly": (
+            "This month broadens your outlook and helps you recover optimism after pressure. "
+            "Seek meaningful experiences, speak honestly without being careless, and turn inspiration into a practical next step."
+        ),
     },
-        "Capricorn": {
-        "daily": "Your Taurus daily text...",
-        "weekly": "Your Taurus weekly text...",
-        "monthly": "Your Taurus monthly text...",
+    "Capricorn": {
+        "daily": (
+            "With Capricorn Moon, you may process feelings by becoming useful, responsible, or quietly self-controlled. "
+            "Meet your duties today, but share the load and acknowledge your emotions before they become exhaustion."
+        ),
+        "weekly": (
+            "Career and long-term responsibilities require focus this week, yet rest is not a distraction from progress. "
+            "Set a boundary around recovery time and ask for concrete support where you need it."
+        ),
+        "monthly": (
+            "This month rewards sustainable progress rather than constant pressure. "
+            "Review your goals, simplify obligations, and recognize your achievements before moving to the next demand."
+        ),
     },
-        "Aquarius": {
-        "daily": "Your Taurus daily text...",
-        "weekly": "Your Taurus weekly text...",
-        "monthly": "Your Taurus monthly text...",
+    "Aquarius": {
+        "daily": (
+            "With Aquarius Moon, you value independence, ideas, and emotional space. "
+            "Give yourself room to think today, but explain your feelings clearly so distance is not mistaken for indifference."
+        ),
+        "weekly": (
+            "This week is productive for group projects, community connections, and unconventional solutions. "
+            "Stay present in personal conversations, because a thoughtful explanation is better than disappearing to process alone."
+        ),
+        "monthly": (
+            "This month supports new networks and a more authentic approach to relationships. "
+            "Keep your individuality while practising consistent check-ins with people who need emotional reliability from you."
+        ),
     },
-        "Pisces": {
-        "daily": "Your Taurus daily text...",
-        "weekly": "Your Taurus weekly text...",
-        "monthly": "Your Taurus monthly text...",
+    "Pisces": {
+        "daily": (
+            "With Pisces Moon, you may absorb moods easily and need quiet time to separate your feelings from the surrounding atmosphere. "
+            "Trust your intuition today, but ground decisions in facts, timing, and clear boundaries."
+        ),
+        "weekly": (
+            "A reflective week favours rest, creativity, spiritual practice, and compassionate conversations. "
+            "Protect your energy, check whether worry is being mistaken for intuition, and keep your routine simple."
+        ),
+        "monthly": (
+            "This month invites emotional healing through creativity, sleep, and kinder self-talk. "
+            "Help others from a position of steadiness rather than guilt, and give your imagination a practical channel."
+        ),
     },
 }
+       
 # ================= Models =================
 class SignupReq(BaseModel):
     name: str
