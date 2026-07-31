@@ -122,7 +122,7 @@ function PhoneAuthForm({ done }) {
           {loading ? "Sending…" : "Send OTP"}
         </Button>
         <p className="text-[11px] text-slate-500 text-center">
-          Demo mode — the OTP will be shown on screen. Add Twilio/MSG91 for real SMS.
+          The OTP will be autopopulated on the screen.
         </p>
       </form>
     );
