@@ -395,7 +395,7 @@ export default function BirthChart() {
         Your Vedic <span className="text-gold italic">birth chart</span>.
       </h1>
       <p className="text-sm text-slate-500 mb-10">
-        Calculated with the Swiss Ephemeris • Lahiri Ayanamsa • Whole Sign houses — the same standard AstroSage uses.
+        Calculated with the Swiss Ephemeris • Lahiri Ayanamsa • Whole Sign houses.
       </p>
 
       <div className="grid md:grid-cols-2 gap-8">
