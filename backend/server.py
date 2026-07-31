@@ -426,7 +426,7 @@ async def phone_send_otp(req: PhoneOtpReq):
     # In production this would be sent via Twilio/MSG91.
     # For demo, we return the OTP so the seeker can complete the flow.
     return {"sent": True, "phone": phone, "demo_otp": otp,
-            "note": "Demo mode — OTP shown here. Plug in Twilio/MSG91 for real SMS."}
+            "note": "OTP will be auto populated here"}
 
 @api_router.post("/auth/phone/verify")
 async def phone_verify(req: PhoneVerifyReq):
