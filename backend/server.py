@@ -102,7 +102,7 @@ HOROSCOPE_TEXT = {
         "monthly": "Your Taurus monthly text...",
     },
         "Gemini": {
-        "daily": "Your Taurus daily text...",
+        "daily": "Your Gemini daily text...",
         "weekly": "Your Taurus weekly text...",
         "monthly": "Your Taurus monthly text...",
     },
@@ -112,6 +112,11 @@ HOROSCOPE_TEXT = {
         "monthly": "Your Taurus monthly text...",
     },
         "Leo": {
+        "daily": "Your Taurus daily text...",
+        "weekly": "Your Taurus weekly text...",
+        "monthly": "Your Taurus monthly text...",
+    },
+      "Virgo": {
         "daily": "Your Taurus daily text...",
         "weekly": "Your Taurus weekly text...",
         "monthly": "Your Taurus monthly text...",
