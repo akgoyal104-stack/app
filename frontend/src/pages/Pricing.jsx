@@ -264,6 +264,7 @@ export default function Pricing() {
                 <a
                   data-testid="upi-open-btn"
                   href={upi?.upi_url || "#"}
+                  aria-disabled="true"
                   className="inline-flex items-center px-6 py-2 rounded-full bg-gold text-black hover:bg-amber-300 transition"
                 >
                   Open in UPI app
