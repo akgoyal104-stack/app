@@ -67,25 +67,59 @@ export default function Landing() {
               <div className="flex items-center gap-2"><Star className="w-4 h-4 text-gold" /> 7 yrs practice</div>
             </div>
           </div>
-          <div className="relative">
-            <div className="absolute -inset-8 bg-gradient-to-br from-amber-500/25 via-transparent to-violet-500/15 blur-3xl -z-10" />
-            {/* Zodiac wheel behind portrait */}
-            <div className="absolute -top-16 -right-10 opacity-70 pointer-events-none hidden md:block">
-              <ZodiacWheel size={420} />
-            </div>
-            <div className="relative rounded-3xl overflow-hidden border border-white/10 glass mt-8 md:mt-16 md:ml-16 max-w-md">
-              <img
-                src="https://customer-assets-39nsmqrw.emergentagent.net/job_zodiac-portal-39/artifacts/2ah3y0f1_325274ac-8ed9-489d-9a14-d48ccf4e95f2.jpeg"
-                alt="Acharya Akash portrait"
-                className="w-full h-[440px] object-cover object-top"
-              />
-              <div className="absolute bottom-0 inset-x-0 p-6 bg-gradient-to-t from-black/85 via-black/40 to-transparent">
-                <p className="text-xs uppercase tracking-[0.3em] font-mono text-amber-400/90">Acharya Akash</p>
-                <p className="text-white text-lg font-serif-display mt-1">Vedic Astrologer • Gold Medalist</p>
-              </div>
-            </div>
+      <div className="relative">
+  <div className="absolute -inset-8 bg-gradient-to-br from-amber-500/25 via-transparent to-violet-500/15 blur-3xl -z-10" />
+
+  {/* Zodiac wheel behind portrait */}
+  <div className="absolute -top-16 -right-10 opacity-70 pointer-events-none hidden md:block">
+    <ZodiacWheel size={420} />
+  </div>
+
+  <div className="relative mt-8 md:mt-16 md:ml-16 max-w-md">
+    <div className="rounded-3xl overflow-hidden border border-white/10 glass">
+      <div
+        className="flex w-full snap-x snap-mandatory overflow-x-auto"
+        aria-label="Acharya Akash image slider"
+      >
+        <div className="min-w-full shrink-0 snap-center relative">
+          <img
+            src="https://customer-assets-39nsmqrw.emergentagent.net/job_zodiac-portal-39/artifacts/2ah3y0f1_325274ac-8ed9-489d-9a14-d48ccf4e95f2.jpeg"
+            alt="Acharya Akash portrait"
+            className="w-full h-[440px] object-cover object-top"
+          />
+          <div className="absolute bottom-0 inset-x-0 p-6 bg-gradient-to-t from-black/85 via-black/40 to-transparent">
+            <p className="text-xs uppercase tracking-[0.3em] font-mono text-amber-400/90">
+              Acharya Akash
+            </p>
+            <p className="text-white text-lg font-serif-display mt-1">
+              Vedic Astrologer • Gold Medalist
+            </p>
           </div>
         </div>
+
+        <div className="min-w-full shrink-0 snap-center relative">
+          <img
+            src="https://res.cloudinary.com/tby6thdx/image/upload/v1785525582/IMG_0664_ailxkm.jpg"
+            alt="Acharya Akash additional image"
+            className="w-full h-[440px] object-cover object-top"
+          />
+          <div className="absolute bottom-0 inset-x-0 p-6 bg-gradient-to-t from-black/85 via-black/40 to-transparent">
+            <p className="text-xs uppercase tracking-[0.3em] font-mono text-amber-400/90">
+              Acharya Akash
+            </p>
+            <p className="text-white text-lg font-serif-display mt-1">
+              Swipe for more
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p className="mt-3 text-center text-xs text-white/50">
+      Swipe left or right to view images
+    </p>
+  </div>
+</div>
       </section>
 
       {/* Marquee */}
