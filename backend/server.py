@@ -352,7 +352,6 @@ async def phone_verify(req: PhoneVerifyReq):
 
 
 # ================= Horoscopes =================
-/*
 @api_router.get("/horoscopes/signs")
 async def list_signs():
     return {"signs": ZODIAC_SIGNS}
@@ -398,7 +397,6 @@ async def get_horoscope(sign: str, period: str = "daily"):
     await db.horoscopes.insert_one(doc.copy())
     doc.pop("_id", None)
     return doc
-    */
 
 # ================= Birth Chart =================
 @api_router.post("/birth-chart")
