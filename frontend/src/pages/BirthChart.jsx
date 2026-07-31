@@ -21,22 +21,37 @@ function renderMarkdown(text = "") {
   return { __html: html };
 }
 
-const NORTH_INDIAN_LABEL_POSITIONS = {
-  1: { x: 200, y: 78 },
-  2: { x: 110, y: 52 },
-  3: { x: 64, y: 145 },
-  4: { x: 110, y: 205 },
-  5: { x: 64, y: 302 },
-  6: { x: 110, y: 352 },
-  7: { x: 200, y: 315 },
-  8: { x: 290, y: 352 },
-  9: { x: 336, y: 302 },
-  10: { x: 290, y: 205 },
-  11: { x: 336, y: 145 },
-  12: { x: 290, y: 52 },
+const NORTH_INDIAN_HOUSE_POLYGONS = {
+  1: "200,20 290,110 200,200 110,110",
+  2: "20,20 200,20 110,110",
+  3: "20,20 110,110 20,200",
+  4: "20,200 110,110 200,200 110,290",
+  5: "20,200 110,290 20,380",
+  6: "20,380 200,380 110,290",
+  7: "200,200 290,290 200,380 110,290",
+  8: "200,380 380,380 290,290",
+  9: "380,380 380,200 290,290",
+  10: "380,200 290,110 200,200 290,290",
+  11: "380,20 380,200 290,110",
+  12: "200,20 380,20 290,110",
 };
 
-const NORTH_INDIAN_INTERNAL_LINES = [
+const NORTH_INDIAN_LABEL_POSITIONS = {
+  1: { x: 200, y: 86 },
+  2: { x: 110, y: 62 },
+  3: { x: 64, y: 143 },
+  4: { x: 110, y: 205 },
+  5: { x: 64, y: 303 },
+  6: { x: 110, y: 350 },
+  7: { x: 200, y: 303 },
+  8: { x: 290, y: 350 },
+  9: { x: 336, y: 303 },
+  10: { x: 290, y: 205 },
+  11: { x: 336, y: 143 },
+  12: { x: 290, y: 62 },
+};
+
+const NORTH_INDIAN_INTERNAL_LINE_PATHS = [
   "M20 20 L110 110 L200 20",
   "M20 200 L110 110 L200 200 L110 290 L20 200",
   "M20 380 L110 290 L200 380",
@@ -45,130 +60,180 @@ const NORTH_INDIAN_INTERNAL_LINES = [
   "M380 20 L290 110 L380 200",
   "M200 20 L290 110 L200 200",
   "M200 200 L290 290",
-].join(" ");
+];
+
+const SIGN_NUMBER = {
+  Aries: 1,
+  Taurus: 2,
+  Gemini: 3,
+  Cancer: 4,
+  Leo: 5,
+  Virgo: 6,
+  Libra: 7,
+  Scorpio: 8,
+  Sagittarius: 9,
+  Capricorn: 10,
+  Aquarius: 11,
+  Pisces: 12,
+};
+
+function getSignNumber(sign) {
+  if (!sign) {
+    return "";
+  }
+
+  const signName = String(sign);
+  const formattedSign =
+    signName.charAt(0).toUpperCase() + signName.slice(1).toLowerCase();
+
+  return SIGN_NUMBER[formattedSign] || "";
+}
+
+function getPlanetAbbreviation(planet) {
+  const value = String(planet || "").trim();
+
+  const abbreviations = {
+    Sun: "Su",
+    Moon: "Mo",
+    Mars: "Ma",
+    Mercury: "Me",
+    Jupiter: "Ju",
+    Venus: "Ve",
+    Saturn: "Sa",
+    Rahu: "Ra",
+    Ketu: "Ke",
+  };
+
+  return abbreviations[value] || value.slice(0, 2);
+}
 
 function ChartVisual({ data }) {
-  const houses = data?.houses || [];
+  const houses = Array.isArray(data?.houses) ? data.houses : [];
 
   const houseByNumber = new Map(
     houses.map((house) => [Number(house.house), house])
   );
 
   return (
-    <div className="relative w-full aspect-square max-w-md mx-auto">
+    <div className="relative w-full max-w-md mx-auto aspect-square">
       <svg
         viewBox="0 0 400 400"
-        className="w-full h-full rounded-xl"
+        className="block w-full h-full rounded-xl"
         role="img"
         aria-label="North Indian Vedic birth chart"
+        preserveAspectRatio="xMidYMid meet"
       >
-        {/* Background */}
+        <defs>
+          {Object.entries(NORTH_INDIAN_HOUSE_POLYGONS).map(
+            ([houseNumber, points]) => (
+              <clipPath
+                key={houseNumber}
+                id={`north-indian-house-${houseNumber}`}
+              >
+                <polygon points={points} />
+              </clipPath>
+            )
+          )}
+        </defs>
+
         <rect
           x="20"
           y="20"
           width="360"
           height="360"
-          fill="rgba(0,0,0,0.4)"
+          fill="rgba(0, 0, 0, 0.35)"
         />
 
-        {/* Outer border: drawn once */}
         <rect
           x="20"
           y="20"
           width="360"
           height="360"
           fill="none"
-          stroke="rgba(251,191,36,0.65)"
+          stroke="#d4a017"
           strokeWidth="2"
           shapeRendering="geometricPrecision"
           vectorEffect="non-scaling-stroke"
         />
 
-        {/* Internal North Indian diamond line: each line is drawn once */}
-        <path
-          d={NORTH_INDIAN_INTERNAL_LINES}
-          fill="none"
-          stroke="rgba(251,191,36,0.65)"
-          strokeWidth="2"
-          strokeLinecap="butt"
-          strokeLinejoin="miter"
-          shapeRendering="geometricPrecision"
-          vectorEffect="non-scaling-stroke"
-        />
+        {NORTH_INDIAN_INTERNAL_LINE_PATHS.map((path, index) => (
+          <path
+            key={index}
+            d={path}
+            fill="none"
+            stroke="#d4a017"
+            strokeWidth="2"
+            strokeLinecap="butt"
+            strokeLinejoin="miter"
+            shapeRendering="geometricPrecision"
+            vectorEffect="non-scaling-stroke"
+          />
+        ))}
 
-        {/* House labels and planets */}
         {Object.entries(NORTH_INDIAN_LABEL_POSITIONS).map(
           ([houseNumber, position]) => {
             const number = Number(houseNumber);
             const house = houseByNumber.get(number);
+            const signNumber = getSignNumber(house?.sign);
 
-            const signSymbol = house
-              ? SIGN_SYMBOL?.[house.sign] || ""
-              : "";
-
-            const planets = (house?.planets || []).map((planet) =>
-              String(planet).slice(0, 2)
-            );
+            const planets = Array.isArray(house?.planets)
+              ? house.planets.map(getPlanetAbbreviation)
+              : [];
 
             const planetLines = [];
 
             for (let index = 0; index < planets.length; index += 3) {
-              planetLines.push(planets.slice(index, index + 3).join(" "));
+              planetLines.push(planets.slice(index, index + 3).join("  "));
             }
 
             return (
-              <g key={number}>
+              <g
+                key={number}
+                clipPath={`url(#north-indian-house-${number})`}
+              >
                 <text
                   x={position.x}
-                  y={position.y - 20}
+                  y={position.y - 25}
                   textAnchor="middle"
-                  fill="rgba(251,191,36,0.75)"
+                  fill="#d4a017"
                   fontSize="10"
                   fontFamily="monospace"
                 >
                   H{number}
                 </text>
 
-                {house && (
-                  <>
-                    <text
-                      x={position.x}
-                      y={position.y - 6}
-                      textAnchor="middle"
-                      fill="#fcd34d"
-                      fontSize="12"
-                      fontWeight="600"
-                    >
-                      {signSymbol} {house.sign}
-                    </text>
+                <text
+                  x={position.x}
+                  y={position.y - 5}
+                  textAnchor="middle"
+                  fill="#fcd34d"
+                  fontSize="17"
+                  fontWeight="700"
+                  fontFamily="sans-serif"
+                >
+                  {signNumber}
+                </text>
 
-                    <text
-                      x={position.x}
-                      y={position.y + 14}
-                      textAnchor="middle"
-                      fill="#e2e8f0"
-                      fontSize="11"
-                      fontFamily="monospace"
-                    >
-                      {planetLines.map((line, index) => (
-                        <tspan
-                          key={`${number}-${index}`}
-                          x={position.x}
-                          dy={index === 0 ? 0 : 14}
-                        >
-                          {line}
-                        </tspan>
-                      ))}
-                    </text>
-                  </>
-                )}
+                {planetLines.map((line, index) => (
+                  <text
+                    key={`${number}-planets-${index}`}
+                    x={position.x}
+                    y={position.y + 16 + index * 14}
+                    textAnchor="middle"
+                    fill="#e2e8f0"
+                    fontSize="11"
+                    fontFamily="monospace"
+                  >
+                    {line}
+                  </text>
+                ))}
 
                 {number === 1 && (
                   <text
                     x={position.x}
-                    y={position.y + 42}
+                    y={position.y + 48 + planetLines.length * 14}
                     textAnchor="middle"
-                    fill="rgba(251,191,36,0.6)"
+                    fill="rgba(251, 191, 36, 0.7)"
                     fontSize="9"
                     fontStyle="italic"
                   >
@@ -180,7 +245,6 @@ function ChartVisual({ data }) {
           }
         )}
 
-        {/* Center marker */}
         <circle
           cx="200"
           cy="200"
@@ -194,7 +258,7 @@ function ChartVisual({ data }) {
           x="200"
           y="196"
           textAnchor="middle"
-          fill="rgba(251,191,36,0.35)"
+          fill="rgba(251, 191, 36, 0.35)"
           fontSize="10"
           fontStyle="italic"
         >
