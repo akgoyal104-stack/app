@@ -204,7 +204,7 @@ export default function Pricing() {
 
       {/* UPI direct payment */}
       <div className="mt-16">
-        <p className="text-xs uppercase tracking-[0.3em] font-mono text-amber-500/80 mb-3">Or pay directly</p>
+        <p className="text-xs uppercase tracking-[0.3em] font-mono text-amber-500/80 mb-3"></p>
         <h2 className="text-3xl md:text-4xl font-serif-display font-light text-white tracking-tight mb-8">
           Pay via <span className="text-gold italic">UPI</span>.
         </h2>
