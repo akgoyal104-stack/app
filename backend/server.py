@@ -391,6 +391,7 @@ async def get_horoscope(sign: str, period: str = "daily"):
         "period": period,
         "cache_key": cache_key,
         "text": HOROSCOPE_TEXT[sign_norm][period],
+        "source": "static",
         "generated_at": datetime.now(timezone.utc).isoformat(),
     }
     await db.horoscopes.insert_one(doc.copy())
