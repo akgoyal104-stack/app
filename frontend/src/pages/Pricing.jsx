@@ -283,7 +283,7 @@ export default function Pricing() {
       </div>
 
       <p className="text-xs text-slate-500 mt-10 text-center">
-        Card payments processed securely by Stripe. Use test card 4242 4242 4242 4242 with any future expiry.
+        UPI payments processed securely.
       </p>
 
       {/* UPI Confirmation Dialog */}
