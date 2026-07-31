@@ -122,7 +122,7 @@ export default function Landing() {
     </p>
   </div>
 </div>    
-    </section>
+  </section>
       {/* Marquee */}
       <div className="border-y border-white/10 py-6 overflow-hidden bg-black/20 backdrop-blur-sm">
         <div className="marquee-track">
