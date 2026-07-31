@@ -84,7 +84,7 @@ export default function Dashboard() {
               <p className="text-slate-400 mt-2 mb-4">
                 Basic questions to Detailed reading 
               </p>
-              <Link to="/pricing"><Button data-testid="dash-book" className="bg-gold text-black hover:bg-amber-300 rounded-full">Book with Acharya Akash</Button></Link>
+              <Link to="/pricing"><Button data-testid="dash-book" className="bg-gold text-black hover:bg-amber-300 rounded-full">Book a consulation with Acharya Akash</Button></Link>
             </CardContent>
           </Card>
         )}
