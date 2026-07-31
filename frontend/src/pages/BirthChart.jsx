@@ -21,127 +21,169 @@ function renderMarkdown(text = "") {
   return { __html: html };
 }
 
-const NORTH_INDIAN_HOUSE_POLYGONS = {
-  1: "200,20 290,110 200,200 110,110",
-  2: "20,20 200,20 110,110",
-  3: "20,20 110,110 20,200",
-  4: "20,200 110,110 200,200 110,290",
-  5: "20,200 110,290 20,380",
-  6: "20,380 200,380 110,290",
-  7: "200,200 290,290 200,380 110,290",
-  8: "200,380 380,380 290,290",
-  9: "380,380 380,200 290,290",
-  10: "380,200 290,110 200,200 290,290",
-  11: "380,20 380,200 290,110",
-  12: "200,20 380,20 290,110",
+const RASHI_NUMBERS = {
+  aries: 1,
+  taurus: 2,
+  gemini: 3,
+  cancer: 4,
+  leo: 5,
+  virgo: 6,
+  libra: 7,
+  scorpio: 8,
+  sagittarius: 9,
+  capricorn: 10,
+  aquarius: 11,
+  pisces: 12,
 };
+
+const PLANET_ABBREVIATIONS = {
+  sun: "Su",
+  moon: "Mo",
+  mars: "Ma",
+  mercury: "Me",
+  jupiter: "Ju",
+  venus: "Ve",
+  saturn: "Sa",
+  rahu: "Ra",
+  ketu: "Ke",
+  uranus: "Ur",
+  neptune: "Ne",
+  pluto: "Pl",
+};
+
+const NORTH_INDIAN_INTERNAL_LINES = [
+  "M20 20 L110 110 L200 20",
+  "M380 20 L290 110 L200 20",
+  "M20 200 L110 110 L200 200 L110 290 L20 200",
+  "M380 200 L290 110 L200 200 L290 290 L380 200",
+  "M20 380 L110 290 L200 380",
+  "M380 380 L290 290 L200 380",
+].join(" ");
 
 const NORTH_INDIAN_LABEL_POSITIONS = {
-  1: { x: 200, y: 86 },
-  2: { x: 110, y: 62 },
-  3: { x: 64, y: 143 },
-  4: { x: 110, y: 205 },
-  5: { x: 64, y: 303 },
-  6: { x: 110, y: 350 },
-  7: { x: 200, y: 303 },
-  8: { x: 290, y: 350 },
-  9: { x: 336, y: 303 },
-  10: { x: 290, y: 205 },
-  11: { x: 336, y: 143 },
-  12: { x: 290, y: 62 },
+  1: {
+    labelX: 200,
+    labelY: 78,
+    planetX: 200,
+    planetY: 124,
+  },
+  2: {
+    labelX: 110,
+    labelY: 52,
+    planetX: 110,
+    planetY: 84,
+  },
+  3: {
+    labelX: 64,
+    labelY: 145,
+    planetX: 42,
+    planetY: 160,
+  },
+  4: {
+    labelX: 110,
+    labelY: 205,
+    planetX: 110,
+    planetY: 232,
+  },
+  5: {
+    labelX: 64,
+    labelY: 302,
+    planetX: 34,
+    planetY: 316,
+  },
+  6: {
+    labelX: 110,
+    labelY: 352,
+    planetX: 110,
+    planetY: 360,
+  },
+  7: {
+    labelX: 200,
+    labelY: 315,
+    planetX: 200,
+    planetY: 336,
+  },
+  8: {
+    labelX: 290,
+    labelY: 352,
+    planetX: 290,
+    planetY: 360,
+  },
+  9: {
+    labelX: 336,
+    labelY: 302,
+    planetX: 366,
+    planetY: 316,
+  },
+  10: {
+    labelX: 290,
+    labelY: 205,
+    planetX: 290,
+    planetY: 232,
+  },
+  11: {
+    labelX: 336,
+    labelY: 145,
+    planetX: 358,
+    planetY: 160,
+  },
+  12: {
+    labelX: 290,
+    labelY: 52,
+    planetX: 290,
+    planetY: 84,
+  },
 };
 
-const NORTH_INDIAN_INTERNAL_LINE_PATHS = [
-  "M20 20 L110 110 L200 20",
-  "M20 200 L110 110 L200 200 L110 290 L20 200",
-  "M20 380 L110 290 L200 380",
-  "M200 380 L290 290 L380 380",
-  "M380 380 L290 290 L380 200",
-  "M380 20 L290 110 L380 200",
-  "M200 20 L290 110 L200 200",
-  "M200 200 L290 290",
-];
-
-const SIGN_NUMBER = {
-  Aries: 1,
-  Taurus: 2,
-  Gemini: 3,
-  Cancer: 4,
-  Leo: 5,
-  Virgo: 6,
-  Libra: 7,
-  Scorpio: 8,
-  Sagittarius: 9,
-  Capricorn: 10,
-  Aquarius: 11,
-  Pisces: 12,
-};
-
-function getSignNumber(sign) {
-  if (!sign) {
-    return "";
+function getRashiNumber(sign) {
+  if (typeof sign === "number") {
+    return sign;
   }
 
-  const signName = String(sign);
-  const formattedSign =
-    signName.charAt(0).toUpperCase() + signName.slice(1).toLowerCase();
+  const normalizedSign = String(sign || "")
+    .trim()
+    .toLowerCase();
 
-  return SIGN_NUMBER[formattedSign] || "";
+  return RASHI_NUMBERS[normalizedSign] || "";
 }
 
 function getPlanetAbbreviation(planet) {
-  const value = String(planet || "").trim();
+  const planetName =
+    typeof planet === "string"
+      ? planet
+      : planet?.name || "";
 
-  const abbreviations = {
-    Sun: "Su",
-    Moon: "Mo",
-    Mars: "Ma",
-    Mercury: "Me",
-    Jupiter: "Ju",
-    Venus: "Ve",
-    Saturn: "Sa",
-    Rahu: "Ra",
-    Ketu: "Ke",
-  };
+  const normalizedPlanet = String(planetName)
+    .trim()
+    .toLowerCase();
 
-  return abbreviations[value] || value.slice(0, 2);
+  return (
+    PLANET_ABBREVIATIONS[normalizedPlanet] ||
+    String(planetName).slice(0, 2)
+  );
 }
 
 function ChartVisual({ data }) {
-  const houses = Array.isArray(data?.houses) ? data.houses : [];
+  const houses = data?.houses || [];
 
   const houseByNumber = new Map(
     houses.map((house) => [Number(house.house), house])
   );
 
   return (
-    <div className="relative w-full max-w-md mx-auto aspect-square">
+    <div className="relative w-full aspect-square max-w-md mx-auto">
       <svg
         viewBox="0 0 400 400"
-        className="block w-full h-full rounded-xl"
+        className="w-full h-full rounded-xl"
         role="img"
         aria-label="North Indian Vedic birth chart"
-        preserveAspectRatio="xMidYMid meet"
       >
-        <defs>
-          {Object.entries(NORTH_INDIAN_HOUSE_POLYGONS).map(
-            ([houseNumber, points]) => (
-              <clipPath
-                key={houseNumber}
-                id={`north-indian-house-${houseNumber}`}
-              >
-                <polygon points={points} />
-              </clipPath>
-            )
-          )}
-        </defs>
-
         <rect
           x="20"
           y="20"
           width="360"
           height="360"
-          fill="rgba(0, 0, 0, 0.35)"
+          fill="rgba(0,0,0,0.4)"
         />
 
         <rect
@@ -150,52 +192,43 @@ function ChartVisual({ data }) {
           width="360"
           height="360"
           fill="none"
-          stroke="#d4a017"
+          stroke="rgba(251,191,36,0.7)"
           strokeWidth="2"
           shapeRendering="geometricPrecision"
-          vectorEffect="non-scaling-stroke"
         />
 
-        {NORTH_INDIAN_INTERNAL_LINE_PATHS.map((path, index) => (
-          <path
-            key={index}
-            d={path}
-            fill="none"
-            stroke="#d4a017"
-            strokeWidth="2"
-            strokeLinecap="butt"
-            strokeLinejoin="miter"
-            shapeRendering="geometricPrecision"
-            vectorEffect="non-scaling-stroke"
-          />
-        ))}
+        <path
+          d={NORTH_INDIAN_INTERNAL_LINES}
+          fill="none"
+          stroke="rgba(251,191,36,0.7)"
+          strokeWidth="2"
+          strokeLinecap="butt"
+          strokeLinejoin="miter"
+          shapeRendering="geometricPrecision"
+        />
 
         {Object.entries(NORTH_INDIAN_LABEL_POSITIONS).map(
           ([houseNumber, position]) => {
             const number = Number(houseNumber);
             const house = houseByNumber.get(number);
-            const signNumber = getSignNumber(house?.sign);
 
-            const planets = Array.isArray(house?.planets)
-              ? house.planets.map(getPlanetAbbreviation)
-              : [];
-
-            const planetLines = [];
-
-            for (let index = 0; index < planets.length; index += 3) {
-              planetLines.push(planets.slice(index, index + 3).join("  "));
+            if (!house) {
+              return null;
             }
 
+            const rashiNumber = getRashiNumber(house.sign);
+
+            const planets = (house.planets || [])
+              .map(getPlanetAbbreviation)
+              .filter(Boolean);
+
             return (
-              <g
-                key={number}
-                clipPath={`url(#north-indian-house-${number})`}
-              >
+              <g key={number}>
                 <text
-                  x={position.x}
-                  y={position.y - 25}
+                  x={position.labelX}
+                  y={position.labelY - 20}
                   textAnchor="middle"
-                  fill="#d4a017"
+                  fill="rgba(251,191,36,0.8)"
                   fontSize="10"
                   fontFamily="monospace"
                 >
@@ -203,37 +236,38 @@ function ChartVisual({ data }) {
                 </text>
 
                 <text
-                  x={position.x}
-                  y={position.y - 5}
+                  x={position.labelX}
+                  y={position.labelY + 4}
                   textAnchor="middle"
                   fill="#fcd34d"
-                  fontSize="17"
+                  fontSize="24"
                   fontWeight="700"
-                  fontFamily="sans-serif"
+                  fontFamily="Arial, sans-serif"
                 >
-                  {signNumber}
+                  {rashiNumber}
                 </text>
 
-                {planetLines.map((line, index) => (
+                {planets.map((planet, index) => (
                   <text
-                    key={`${number}-planets-${index}`}
-                    x={position.x}
-                    y={position.y + 16 + index * 14}
+                    key={`${number}-${planet}-${index}`}
+                    x={position.planetX}
+                    y={position.planetY + index * 12}
                     textAnchor="middle"
                     fill="#e2e8f0"
-                    fontSize="11"
+                    fontSize="10"
+                    fontWeight="500"
                     fontFamily="monospace"
                   >
-                    {line}
+                    {planet}
                   </text>
                 ))}
 
                 {number === 1 && (
                   <text
-                    x={position.x}
-                    y={position.y + 48 + planetLines.length * 14}
+                    x={position.labelX}
+                    y={position.labelY + 48}
                     textAnchor="middle"
-                    fill="rgba(251, 191, 36, 0.7)"
+                    fill="rgba(251,191,36,0.65)"
                     fontSize="9"
                     fontStyle="italic"
                   >
@@ -258,7 +292,7 @@ function ChartVisual({ data }) {
           x="200"
           y="196"
           textAnchor="middle"
-          fill="rgba(251, 191, 36, 0.35)"
+          fill="rgba(251,191,36,0.35)"
           fontSize="10"
           fontStyle="italic"
         >
