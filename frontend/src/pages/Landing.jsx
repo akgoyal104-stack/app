@@ -110,7 +110,7 @@ export default function Landing() {
         </div>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {[
-            { icon: Sun, title: "Daily Horoscopes", desc: "Daily predictions based on Moon sign", to: "/horoscopes" },
+            { icon: Sun, title: "Daily Horoscopes", desc: "Predictions based on Moon sign", to: "/horoscopes" },
             { icon: Compass, title: "Birth Chart", desc: "Casting birth chart as per Lahiri Ayanamsha", to: "/birth-chart" },
             { icon: Moon, title: "Compatibility", desc: "Guna Milan", to: "/compatibility" },
             { icon: MessageCircle, title: "AI Astrologer", desc: "Ask anything", to: "/ai-astrologer" },
