@@ -48,83 +48,94 @@ const PLANET_ABBREVIATIONS = {
   Ketu: "Ke",
 };
 
-const SIGN_NUMBER = {
-  Aries: 1,
-  Taurus: 2,
-  Gemini: 3,
-  Cancer: 4,
-  Leo: 5,
-  Virgo: 6,
-  Libra: 7,
-  Scorpio: 8,
-  Sagittarius: 9,
-  Capricorn: 10,
-  Aquarius: 11,
-  Pisces: 12,
-};
-
-const NORTH_INDIAN_CONTENT_POSITIONS = {
+const NORTH_INDIAN_HOUSES = {
   1: {
-    house: { x: 200, y: 76 },
-    sign: { x: 200, y: 112 },
-    planets: { x: 200, y: 145 },
+    points: "200,20 290,110 200,200 110,110",
+    box: { x: 125, y: 32, width: 150, height: 145 },
+    columns: 3,
   },
   2: {
-    house: { x: 110, y: 47 },
-    sign: { x: 110, y: 70 },
-    planets: { x: 110, y: 93 },
+    points: "20,20 200,20 110,110",
+    box: { x: 65, y: 30, width: 90, height: 76 },
+    columns: 2,
   },
   3: {
-    house: { x: 78, y: 136 },
-    sign: { x: 78, y: 164 },
-    planets: { x: 78, y: 190 },
+    points: "20,20 110,110 20,200",
+    box: { x: 28, y: 96, width: 94, height: 78 },
+    columns: 2,
   },
   4: {
-    house: { x: 120, y: 207 },
-    sign: { x: 120, y: 235 },
-    planets: { x: 120, y: 263 },
+    points: "20,200 110,110 200,200 110,290",
+    box: { x: 55, y: 145, width: 110, height: 110 },
+    columns: 3,
   },
   5: {
-    house: { x: 78, y: 278 },
-    sign: { x: 78, y: 306 },
-    planets: { x: 78, y: 333 },
+    points: "20,200 110,290 20,380",
+    box: { x: 28, y: 238, width: 94, height: 82 },
+    columns: 2,
   },
   6: {
-    house: { x: 120, y: 319 },
-    sign: { x: 120, y: 343 },
-    planets: { x: 120, y: 367 },
+    points: "20,380 200,380 110,290",
+    box: { x: 65, y: 306, width: 90, height: 64 },
+    columns: 2,
   },
   7: {
-    house: { x: 200, y: 278 },
-    sign: { x: 200, y: 306 },
-    planets: { x: 200, y: 337 },
+    points: "110,290 200,200 290,290 200,380",
+    box: { x: 125, y: 278, width: 150, height: 92 },
+    columns: 3,
   },
   8: {
-    house: { x: 280, y: 319 },
-    sign: { x: 280, y: 343 },
-    planets: { x: 280, y: 367 },
+    points: "200,380 380,380 290,290",
+    box: { x: 245, y: 306, width: 90, height: 64 },
+    columns: 2,
   },
   9: {
-    house: { x: 322, y: 278 },
-    sign: { x: 322, y: 306 },
-    planets: { x: 322, y: 333 },
+    points: "380,200 380,380 290,290",
+    box: { x: 278, y: 238, width: 94, height: 82 },
+    columns: 2,
   },
   10: {
-    house: { x: 280, y: 207 },
-    sign: { x: 280, y: 235 },
-    planets: { x: 280, y: 263 },
+    points: "380,200 290,110 200,200 290,290",
+    box: { x: 235, y: 145, width: 110, height: 110 },
+    columns: 3,
   },
   11: {
-    house: { x: 322, y: 136 },
-    sign: { x: 322, y: 164 },
-    planets: { x: 322, y: 190 },
+    points: "380,20 380,200 290,110",
+    box: { x: 278, y: 96, width: 94, height: 78 },
+    columns: 2,
   },
   12: {
-    house: { x: 290, y: 47 },
-    sign: { x: 290, y: 70 },
-    planets: { x: 290, y: 93 },
+    points: "200,20 380,20 290,110",
+    box: { x: 245, y: 30, width: 90, height: 76 },
+    columns: 2,
   },
 };
+
+const NORTH_INDIAN_LINES = `
+  M20 20 L110 110 L200 20
+  M20 200 L110 110 L200 200 L110 290 L20 200
+  M20 380 L110 290 L200 380
+  M200 380 L290 290 L380 380
+  M380 380 L290 290 L380 200
+  M380 20 L290 110 L380 200
+  M200 20 L290 110 L200 200
+  M200 200 L290 290
+`;
+
+function getPlanetAbbreviation(planet) {
+  const name = String(planet || "").trim();
+  return PLANET_ABBREVIATIONS[name] || name.slice(0, 2);
+}
+
+function makePlanetLines(planets, columns) {
+  const lines = [];
+
+  for (let index = 0; index < planets.length; index += columns) {
+    lines.push(planets.slice(index, index + columns).join("  "));
+  }
+
+  return lines;
+}
 
 function ChartVisual({ data }) {
   const houses = data?.houses || [];
@@ -141,6 +152,18 @@ function ChartVisual({ data }) {
         role="img"
         aria-label="North Indian Vedic birth chart"
       >
+        <defs>
+          {Object.entries(NORTH_INDIAN_HOUSES).map(([houseNumber, house]) => (
+            <clipPath
+              key={houseNumber}
+              id={`north-indian-house-${houseNumber}`}
+              clipPathUnits="userSpaceOnUse"
+            >
+              <polygon points={house.points} />
+            </clipPath>
+          ))}
+        </defs>
+
         <rect
           x="20"
           y="20"
@@ -155,41 +178,35 @@ function ChartVisual({ data }) {
           width="360"
           height="360"
           fill="none"
-          stroke="rgba(251,191,36,0.65)"
+          stroke="rgba(251,191,36,0.7)"
           strokeWidth="2"
           vectorEffect="non-scaling-stroke"
+          shapeRendering="geometricPrecision"
         />
 
         <path
-          d="
-            M20 20 L110 110 L200 20
-            M20 200 L110 110 L200 200 L110 290 L20 200
-            M20 380 L110 290 L200 380
-            M200 380 L290 290 L380 380
-            M380 380 L290 290 L380 200
-            M380 20 L290 110 L380 200
-            M200 20 L290 110 L200 200
-            M200 200 L290 290
-          "
+          d={NORTH_INDIAN_LINES}
           fill="none"
-          stroke="rgba(251,191,36,0.65)"
+          stroke="rgba(251,191,36,0.7)"
           strokeWidth="2"
           strokeLinecap="butt"
           strokeLinejoin="miter"
           vectorEffect="non-scaling-stroke"
+          shapeRendering="geometricPrecision"
         />
 
-        {Object.entries(NORTH_INDIAN_CONTENT_POSITIONS).map(
-          ([houseNumber, position]) => {
+        {Object.entries(NORTH_INDIAN_HOUSES).map(
+          ([houseNumber, layout]) => {
             const number = Number(houseNumber);
             const house = houseByNumber.get(number);
+            const box = layout.box;
 
             if (!house) {
               return (
                 <text
                   key={number}
-                  x={position.house.x}
-                  y={position.house.y}
+                  x={box.x + box.width / 2}
+                  y={box.y + 15}
                   textAnchor="middle"
                   fill="rgba(251,191,36,0.75)"
                   fontSize="10"
@@ -200,34 +217,29 @@ function ChartVisual({ data }) {
               );
             }
 
-            const signNumber = SIGN_NUMBER[house.sign] || "";
+            const signNumber = RASHI_NUMBERS[house.sign] || "";
 
-            const planets = (house.planets || []).map((planet) =>
-              String(planet).slice(0, 2)
-            );
+            const planets = (house.planets || [])
+              .map(getPlanetAbbreviation)
+              .filter(Boolean);
 
-            const planetLines = [];
-
-            for (let index = 0; index < planets.length; index += 3) {
-              planetLines.push(planets.slice(index, index + 3).join(" "));
-            }
-
-            const planetFontSize =
-              planets.length >= 5 ? 8 : planets.length >= 3 ? 9 : 10;
-
+            const planetLines = makePlanetLines(planets, layout.columns);
+            const planetFontSize = planets.length >= 5 ? 10 : 11;
             const lineHeight = planetFontSize + 3;
-
-            const firstPlanetY =
-              position.planets.y -
-              ((planetLines.length - 1) * lineHeight) / 2;
+            const contentHeight = 15 + 27 + planetLines.length * lineHeight;
+            const startY =
+              box.y + Math.max(14, (box.height - contentHeight) / 2);
 
             return (
-              <g key={number}>
+              <g
+                key={number}
+                clipPath={`url(#north-indian-house-${number})`}
+              >
                 <text
-                  x={position.house.x}
-                  y={position.house.y}
+                  x={box.x + box.width / 2}
+                  y={startY}
                   textAnchor="middle"
-                  fill="rgba(251,191,36,0.75)"
+                  fill="rgba(251,191,36,0.8)"
                   fontSize="10"
                   fontFamily="monospace"
                 >
@@ -235,11 +247,11 @@ function ChartVisual({ data }) {
                 </text>
 
                 <text
-                  x={position.sign.x}
-                  y={position.sign.y}
+                  x={box.x + box.width / 2}
+                  y={startY + 26}
                   textAnchor="middle"
                   fill="#fcd34d"
-                  fontSize="17"
+                  fontSize="24"
                   fontWeight="700"
                   fontFamily="sans-serif"
                 >
@@ -248,8 +260,8 @@ function ChartVisual({ data }) {
 
                 {planetLines.length > 0 && (
                   <text
-                    x={position.planets.x}
-                    y={firstPlanetY}
+                    x={box.x + box.width / 2}
+                    y={startY + 47}
                     textAnchor="middle"
                     fill="#e2e8f0"
                     fontSize={planetFontSize}
@@ -257,8 +269,8 @@ function ChartVisual({ data }) {
                   >
                     {planetLines.map((line, index) => (
                       <tspan
-                        key={`${number}-${index}`}
-                        x={position.planets.x}
+                        key={`${number}-planet-line-${index}`}
+                        x={box.x + box.width / 2}
                         dy={index === 0 ? 0 : lineHeight}
                       >
                         {line}
@@ -270,10 +282,10 @@ function ChartVisual({ data }) {
                 {number === 1 && (
                   <text
                     x="200"
-                    y="198"
+                    y="184"
                     textAnchor="middle"
-                    fill="rgba(251,191,36,0.6)"
-                    fontSize="9"
+                    fill="rgba(251,191,36,0.65)"
+                    fontSize="10"
                     fontStyle="italic"
                   >
                     Lagna
@@ -297,8 +309,8 @@ function ChartVisual({ data }) {
           x="200"
           y="196"
           textAnchor="middle"
-          fill="rgba(251,191,36,0.35)"
-          fontSize="10"
+          fill="rgba(251,191,36,0.3)"
+          fontSize="9"
           fontStyle="italic"
         >
           Kundali
