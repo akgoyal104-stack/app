@@ -21,57 +21,6 @@ function renderMarkdown(text = "") {
   return { __html: html };
 }
 
-#function ChartVisual({ data }) {
-  // North Indian style diamond chart (4x4 grid). Houses 1..12 fixed positions.
-  // 1=top center, then clockwise
-  const positions = {
-    1: { row: 1, col: 2 }, 2: { row: 1, col: 1 }, 3: { row: 2, col: 1 },
-    4: { row: 3, col: 1 }, 5: { row: 4, col: 1 }, 6: { row: 4, col: 2 },
-    7: { row: 4, col: 3 }, 8: { row: 4, col: 4 }, 9: { row: 3, col: 4 },
-    10: { row: 2, col: 4 }, 11: { row: 1, col: 4 }, 12: { row: 1, col: 3 },
-  };
-  const houses = data.houses || [];
-  return (
-    <div className="relative w-full aspect-square max-w-md mx-auto">
-      <div className="grid grid-cols-4 grid-rows-4 gap-0 border border-amber-400/30 h-full rounded-xl overflow-hidden bg-black/40">
-        {[...Array(16)].map((_, idx) => {
-          const row = Math.floor(idx / 4) + 1;
-          const col = (idx % 4) + 1;
-          const houseEntry = Object.entries(positions).find(([, p]) => p.row === row && p.col === col);
-          const houseNum = houseEntry ? parseInt(houseEntry[0]) : null;
-          const isEmpty = !houseNum;
-          const h = houseNum ? houses.find(hh => hh.house === houseNum) : null;
-          return (
-            <div
-              key={idx}
-              className={`border border-amber-400/10 p-2 flex flex-col ${isEmpty ? "bg-amber-500/5" : ""}`}
-              style={{ minHeight: 0 }}
-            >
-              {h && (
-                <>
-                  <div className="text-[10px] font-mono text-amber-500/70 mb-1">
-                    H{h.house} · {SIGN_SYMBOL[h.sign]}
-                  </div>
-                  <div className="flex flex-wrap gap-1 text-[10px] text-slate-200 leading-tight">
-                    {h.planets.map(p => (
-                      <span key={p} className="px-1 py-0.5 bg-amber-500/20 rounded text-amber-200">{p.slice(0, 2)}</span>
-                    ))}
-                  </div>
-                </>
-              )}
-              {isEmpty && (row === 2 || row === 3) && (col === 2 || col === 3) && row === 2 && col === 2 && (
-                <div className="col-span-2 row-span-2 flex items-center justify-center text-xs font-serif-display text-amber-400/40 italic absolute inset-1/4">
-                  Kundali
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
 const NORTH_INDIAN_HOUSE_SHAPES = [
   { house: 1, points: "200,200 105,105 200,20 295,105", x: 200, y: 66 },
   { house: 2, points: "20,20 200,20 105,105", x: 108, y: 50 },
