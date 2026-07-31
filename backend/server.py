@@ -126,12 +126,12 @@ HOROSCOPE_TEXT = {
         "weekly": "Your Taurus weekly text...",
         "monthly": "Your Taurus monthly text...",
     },
-        "Scorpi0": {
+        "Scorpio": {
         "daily": "Your Taurus daily text...",
         "weekly": "Your Taurus weekly text...",
         "monthly": "Your Taurus monthly text...",
     },
-        "Saigittarius": {
+        "Sagittarius": {
         "daily": "Your Taurus daily text...",
         "weekly": "Your Taurus weekly text...",
         "monthly": "Your Taurus monthly text...",
@@ -146,7 +146,7 @@ HOROSCOPE_TEXT = {
         "weekly": "Your Taurus weekly text...",
         "monthly": "Your Taurus monthly text...",
     },
-        "Picses": {
+        "Pisces": {
         "daily": "Your Taurus daily text...",
         "weekly": "Your Taurus weekly text...",
         "monthly": "Your Taurus monthly text...",
