@@ -396,7 +396,7 @@ if period_norm not in {"daily", "weekly", "monthly"}:
         "at Bhartiya Vidya Bhavan, New Delhi. Write authentic, warm, insightful Vedic horoscopes. "
         "Blend traditional Vedic wisdom (nakshatras, dashas, planetary influences) with practical guidance. "
         "Return ONLY the reading text, 4-6 sentences, no preamble."
-    )
+    #)
     #prompt = f"Write a {period} horoscope for {sign_norm} for {today}. Include a lucky color and a lucky number."
    # text = HOROSCOPE_TEXT[sign_norm][period]
      horoscope_text = HOROSCOPE_TEXT[sign_norm][period_norm]
