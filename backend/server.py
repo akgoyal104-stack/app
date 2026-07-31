@@ -356,67 +356,27 @@ async def phone_verify(req: PhoneVerifyReq):
 async def list_signs():
     return {"signs": ZODIAC_SIGNS}
 
+
 @api_router.get("/horoscopes/{sign}")
 async def get_horoscope(sign: str, period: str = "daily"):
-    #sign_norm = sign.capitalize()
-    sign_norm = next(
-    (
-        zodiac_sign
-        for zodiac_sign in ZODIAC_SIGNS
-        if zodiac_sign.casefold() == sign.strip().casefold()
-    ),
-    None,
-)
-    #if sign_norm not in ZODIAC_SIGNS:
-        #raise HTTPException(400, "Invalid zodiac sign")
-    if not sign_norm:
-    raise HTTPException(400, "Invalid zodiac sign")
-    #if period not in {"daily", "weekly", "monthly"}:
-        #raise HTTPException(400, "Invalid period")
+    sign_norm = sign.strip().capitalize()
+
+    if sign_norm not in ZODIAC_SIGNS:
+        raise HTTPException(400, "Invalid zodiac sign")
+
     period_norm = period.strip().lower()
-if period_norm not in {"daily", "weekly", "monthly"}:
-    raise HTTPException(400, "Invalid period")
-    #today = date.today().isoformat()
-    # cache key by day for daily, week-start for weekly, month for monthly
-   # if period == "weekly":
-        #d = date.today()
-       # cache_key = (d - timedelta(days=d.weekday())).isoformat()
-   # elif period == "monthly":
-       # cache_key = date.today().strftime("%Y-%m")
-   # else:
-      #  cache_key = today
-    #cached = await db.horoscopes.find_one(
-       # {"sign": sign_norm, "period": period, "cache_key": cache_key},
-        #{"_id": 0},
-  #  )
-   # if cached:
-       # return cached
-   # system = (
-        "You are Acharya Akash, a Gold Medalist Vedic astrologer from KN Rao's institute "
-        "at Bhartiya Vidya Bhavan, New Delhi. Write authentic, warm, insightful Vedic horoscopes. "
-        "Blend traditional Vedic wisdom (nakshatras, dashas, planetary influences) with practical guidance. "
-        "Return ONLY the reading text, 4-6 sentences, no preamble."
-    #)
-    #prompt = f"Write a {period} horoscope for {sign_norm} for {today}. Include a lucky color and a lucky number."
-   # text = HOROSCOPE_TEXT[sign_norm][period]
-     horoscope_text = HOROSCOPE_TEXT[sign_norm][period_norm]
-   # doc = {
+
+    if period_norm not in {"daily", "weekly", "monthly"}:
+        raise HTTPException(400, "Invalid period")
+
+    horoscope_text = HOROSCOPE_TEXT[sign_norm][period_norm]
+
+    return {
         "sign": sign_norm,
-        "period": period,
-        "cache_key": cache_key,
-        "text": HOROSCOPE_TEXT[sign_norm][period],
+        "period": period_norm,
+        "text": horoscope_text,
         "source": "static",
-        "generated_at": datetime.now(timezone.utc).isoformat(),
     }
-   # await db.horoscopes.insert_one(doc.copy())
-   # doc.pop("_id", None)
-   # return doc
-return {
-    "sign": sign_norm,
-    "period": period_norm,
-    "text": horoscope_text,
-    "source": "static",
-}
 
 # ================= Birth Chart =================
 @api_router.post("/birth-chart")
