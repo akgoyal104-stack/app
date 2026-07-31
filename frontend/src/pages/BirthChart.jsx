@@ -48,7 +48,7 @@ function ChartVisual({ data }) {
         viewBox="0 0 400 400"
         className="w-full h-full rounded-xl"
         role="img"
-        aria-label="North Indian 'Parashari Vedic birth chart"
+        aria-label="North Indian Parashari Vedic birth chart"
       >
         <rect
           x="20"
