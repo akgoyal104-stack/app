@@ -92,9 +92,9 @@ ZODIAC_SIGNS = [
 ]
 HOROSCOPE_TEXT = {
     "Aries": {
-        "daily": "Your Aries daily text...",
-        "weekly": "Your Aries weekly text...",
-        "monthly": "Your Aries monthly text...",
+        "daily": "Take initiative today, but pause before reacting to small frustrations. A practical conversation can open a useful opportunity. Keep your focus on one important task rather than scattering your energy. Lucky color: red. Lucky number: 9.",
+        "weekly": "This week favors decisive action and fresh starts. Your confidence will attract attention, but patience will help you turn interest into lasting progress. Make time for rest before committing to another responsibility. Lucky color: orange. Lucky number: 1.",
+        "monthly": "This month encourages you to lead with clarity rather than urgency. Career and personal goals can move forward when you establish realistic milestones and communicate them directly. Relationships benefit from listening before offering solutions. Lucky color: crimson. Lucky number: 18.",
     },
     "Taurus": {
         "daily": "Your Taurus daily text...",
