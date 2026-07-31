@@ -90,7 +90,63 @@ ZODIAC_SIGNS = [
     "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo",
     "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"
 ]
-
+HOROSCOPE_TEXT = {
+    "Aries": {
+        "daily": "Your Aries daily text...",
+        "weekly": "Your Aries weekly text...",
+        "monthly": "Your Aries monthly text...",
+    },
+    "Taurus": {
+        "daily": "Your Taurus daily text...",
+        "weekly": "Your Taurus weekly text...",
+        "monthly": "Your Taurus monthly text...",
+    },
+        "Gemini": {
+        "daily": "Your Taurus daily text...",
+        "weekly": "Your Taurus weekly text...",
+        "monthly": "Your Taurus monthly text...",
+    },
+        "Cancer": {
+        "daily": "Your Taurus daily text...",
+        "weekly": "Your Taurus weekly text...",
+        "monthly": "Your Taurus monthly text...",
+    },
+        "Leo": {
+        "daily": "Your Taurus daily text...",
+        "weekly": "Your Taurus weekly text...",
+        "monthly": "Your Taurus monthly text...",
+    },
+        "Libra": {
+        "daily": "Your Taurus daily text...",
+        "weekly": "Your Taurus weekly text...",
+        "monthly": "Your Taurus monthly text...",
+    },
+        "Scorpi0": {
+        "daily": "Your Taurus daily text...",
+        "weekly": "Your Taurus weekly text...",
+        "monthly": "Your Taurus monthly text...",
+    },
+        "Saigittarius": {
+        "daily": "Your Taurus daily text...",
+        "weekly": "Your Taurus weekly text...",
+        "monthly": "Your Taurus monthly text...",
+    },
+        "Capricorn": {
+        "daily": "Your Taurus daily text...",
+        "weekly": "Your Taurus weekly text...",
+        "monthly": "Your Taurus monthly text...",
+    },
+        "Aquarius": {
+        "daily": "Your Taurus daily text...",
+        "weekly": "Your Taurus weekly text...",
+        "monthly": "Your Taurus monthly text...",
+    },
+        "Picses": {
+        "daily": "Your Taurus daily text...",
+        "weekly": "Your Taurus weekly text...",
+        "monthly": "Your Taurus monthly text...",
+    },
+}
 # ================= Models =================
 class SignupReq(BaseModel):
     name: str
