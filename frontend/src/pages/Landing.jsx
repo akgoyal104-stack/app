@@ -67,7 +67,7 @@ export default function Landing() {
               <div className="flex items-center gap-2"><Star className="w-4 h-4 text-gold" /> 7 yrs practice</div>
             </div>
           </div>
-      <div className="relative">
+    <div className="relative">
   <div className="absolute -inset-8 bg-gradient-to-br from-amber-500/25 via-transparent to-violet-500/15 blur-3xl -z-10" />
 
   {/* Zodiac wheel behind portrait */}
@@ -81,34 +81,36 @@ export default function Landing() {
         className="flex w-full snap-x snap-mandatory overflow-x-auto"
         aria-label="Acharya Akash image slider"
       >
-        <div className="min-w-full shrink-0 snap-center relative">
+        <div className="relative min-w-full shrink-0 snap-center">
           <img
             src="https://customer-assets-39nsmqrw.emergentagent.net/job_zodiac-portal-39/artifacts/2ah3y0f1_325274ac-8ed9-489d-9a14-d48ccf4e95f2.jpeg"
             alt="Acharya Akash portrait"
-            className="w-full h-[440px] object-cover object-top"
+            className="h-[440px] w-full object-cover object-top"
           />
-          <div className="absolute bottom-0 inset-x-0 p-6 bg-gradient-to-t from-black/85 via-black/40 to-transparent">
+
+          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent p-6">
             <p className="text-xs uppercase tracking-[0.3em] font-mono text-amber-400/90">
               Acharya Akash
             </p>
-            <p className="text-white text-lg font-serif-display mt-1">
+            <p className="mt-1 text-lg text-white font-serif-display">
               Vedic Astrologer • Gold Medalist
             </p>
           </div>
         </div>
 
-        <div className="min-w-full shrink-0 snap-center relative">
+        <div className="relative min-w-full shrink-0 snap-center">
           <img
             src="https://res.cloudinary.com/tby6thdx/image/upload/v1785525582/IMG_0664_ailxkm.jpg"
             alt="Acharya Akash additional image"
-            className="w-full h-[440px] object-cover object-top"
+            className="h-[440px] w-full object-cover object-top"
           />
-          <div className="absolute bottom-0 inset-x-0 p-6 bg-gradient-to-t from-black/85 via-black/40 to-transparent">
+
+          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent p-6">
             <p className="text-xs uppercase tracking-[0.3em] font-mono text-amber-400/90">
               Acharya Akash
             </p>
-            <p className="text-white text-lg font-serif-display mt-1">
-              Swipe for more
+            <p className="mt-1 text-lg text-white font-serif-display">
+              Vedic Astrology Services
             </p>
           </div>
         </div>
@@ -120,6 +122,7 @@ export default function Landing() {
     </p>
   </div>
 </div>
+          
       </section>
 
       {/* Marquee */}
