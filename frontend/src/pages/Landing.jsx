@@ -121,10 +121,8 @@ export default function Landing() {
       Swipe left or right to view images
     </p>
   </div>
-</div>
-          
-      </section>
-
+</div>    
+    </section>
       {/* Marquee */}
       <div className="border-y border-white/10 py-6 overflow-hidden bg-black/20 backdrop-blur-sm">
         <div className="marquee-track">
