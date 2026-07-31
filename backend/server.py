@@ -378,19 +378,19 @@ async def get_horoscope(sign: str, period: str = "daily"):
     )
     if cached:
         return cached
-    system = (
+    #system = (
         "You are Acharya Akash, a Gold Medalist Vedic astrologer from KN Rao's institute "
         "at Bhartiya Vidya Bhavan, New Delhi. Write authentic, warm, insightful Vedic horoscopes. "
         "Blend traditional Vedic wisdom (nakshatras, dashas, planetary influences) with practical guidance. "
         "Return ONLY the reading text, 4-6 sentences, no preamble."
     )
-    prompt = f"Write a {period} horoscope for {sign_norm} for {today}. Include a lucky color and a lucky number."
-    text = HOROSCOPE_TEXT[sign_norm][period],
+    #prompt = f"Write a {period} horoscope for {sign_norm} for {today}. Include a lucky color and a lucky number."
+    #text = HOROSCOPE_TEXT[sign_norm][period],
     doc = {
         "sign": sign_norm,
         "period": period,
         "cache_key": cache_key,
-        "text": text,
+        "text": HOROSCOPE_TEXT[sign_norm][period],
         "generated_at": datetime.now(timezone.utc).isoformat(),
     }
     await db.horoscopes.insert_one(doc.copy())
