@@ -110,7 +110,6 @@ export default function Landing() {
               Acharya Akash
             </p>
             <p className="mt-1 text-lg text-white font-serif-display">
-              Vedic Astrology Services
             </p>
           </div>
         </div>
