@@ -58,7 +58,7 @@ function EmailAuthForm({ mode, setMode, done }) {
         <button data-testid="auth-toggle-mode" type="button" className="text-gold hover:underline"
           onClick={() => setMode(mode === "signup" ? "login" : "signup")}>
           {mode === "signup" ? "Sign in" : "Create one"}
-        </button>
+        </button> 
       </div>
     </form>
   );
