@@ -36,7 +36,7 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto px-6 py-24 md:py-32 grid md:grid-cols-2 gap-16 items-center">
           <div>
             <p className="text-xs uppercase tracking-[0.3em] font-mono text-amber-500/80 mb-6" data-testid="hero-eyebrow">
-              Vedic Astrology • Lineage of KN Rao
+              Vedic Astrology
             </p>
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-serif-display font-light tracking-tighter text-white leading-[1.05]">
               Ancient stars,
