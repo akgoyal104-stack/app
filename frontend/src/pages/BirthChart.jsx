@@ -21,23 +21,35 @@ function renderMarkdown(text = "") {
   return { __html: html };
 }
 
-const NORTH_INDIAN_HOUSE_SHAPES = [
-  { house: 1, points: "200,200 105,105 200,20 295,105", x: 200, y: 66 },
-  { house: 2, points: "20,20 200,20 105,105", x: 108, y: 50 },
-  { house: 3, points: "20,20 20,200 105,105", x: 54, y: 108 },
-  { house: 4, points: "20,200 105,105 200,200 105,295", x: 108, y: 201 },
-  { house: 5, points: "20,200 20,380 105,295", x: 54, y: 292 },
-  { house: 6, points: "20,380 200,380 105,295", x: 108, y: 350 },
-  { house: 7, points: "200,200 105,295 200,380 295,295", x: 200, y: 294 },
-  { house: 8, points: "200,380 380,380 295,295", x: 292, y: 350 },
-  { house: 9, points: "380,380 380,200 295,295", x: 346, y: 292 },
-  { house: 10, points: "380,200 295,295 200,200 295,105", x: 292, y: 201 },
-  { house: 11, points: "380,200 380,20 295,105", x: 346, y: 108 },
-  { house: 12, points: "380,20 200,20 295,105", x: 292, y: 50 },
-];
+const NORTH_INDIAN_LABEL_POSITIONS = {
+  1: { x: 200, y: 78 },
+  2: { x: 110, y: 52 },
+  3: { x: 64, y: 145 },
+  4: { x: 110, y: 205 },
+  5: { x: 64, y: 302 },
+  6: { x: 110, y: 352 },
+  7: { x: 200, y: 315 },
+  8: { x: 290, y: 352 },
+  9: { x: 336, y: 302 },
+  10: { x: 290, y: 205 },
+  11: { x: 336, y: 145 },
+  12: { x: 290, y: 52 },
+};
+
+const NORTH_INDIAN_INTERNAL_LINES = [
+  "M20 20 L110 110 L200 20",
+  "M20 200 L110 110 L200 200 L110 290 L20 200",
+  "M20 380 L110 290 L200 380",
+  "M200 380 L290 290 L380 380",
+  "M380 380 L290 290 L380 200",
+  "M380 20 L290 110 L380 200",
+  "M200 20 L290 110 L200 200",
+  "M200 200 L290 290",
+].join(" ");
 
 function ChartVisual({ data }) {
   const houses = data?.houses || [];
+
   const houseByNumber = new Map(
     houses.map((house) => [Number(house.house), house])
   );
@@ -48,105 +60,127 @@ function ChartVisual({ data }) {
         viewBox="0 0 400 400"
         className="w-full h-full rounded-xl"
         role="img"
-        aria-label="North Indian Parashari Vedic birth chart"
+        aria-label="North Indian Vedic birth chart"
       >
+        {/* Background */}
         <rect
           x="20"
           y="20"
           width="360"
           height="360"
           fill="rgba(0,0,0,0.4)"
-          stroke="rgba(251,191,36,0.55)"
-          strokeWidth="2"
         />
 
-        {NORTH_INDIAN_HOUSE_SHAPES.map((shape) => {
-          const house = houseByNumber.get(shape.house);
-          const planetNames = (house?.planets || []).map((planet) =>
-            String(planet).slice(0, 2)
-          );
-          const planetLines = [];
+        {/* Outer border: drawn once */}
+        <rect
+          x="20"
+          y="20"
+          width="360"
+          height="360"
+          fill="none"
+          stroke="rgba(251,191,36,0.65)"
+          strokeWidth="2"
+          shapeRendering="geometricPrecision"
+          vectorEffect="non-scaling-stroke"
+        />
 
-          for (let i = 0; i < planetNames.length; i += 3) {
-            planetLines.push(planetNames.slice(i, i + 3).join(" "));
-          }
+        {/* Internal North Indian diamond lines: each line is drawn once */}
+        <path
+          d={NORTH_INDIAN_INTERNAL_LINES}
+          fill="none"
+          stroke="rgba(251,191,36,0.65)"
+          strokeWidth="2"
+          strokeLinecap="butt"
+          strokeLinejoin="miter"
+          shapeRendering="geometricPrecision"
+          vectorEffect="non-scaling-stroke"
+        />
 
-          const signSymbol = house
-            ? SIGN_SYMBOL?.[house.sign] || ""
-            : "";
+        {/* House labels and planets */}
+        {Object.entries(NORTH_INDIAN_LABEL_POSITIONS).map(
+          ([houseNumber, position]) => {
+            const number = Number(houseNumber);
+            const house = houseByNumber.get(number);
 
-          const isKendra = [1, 4, 7, 10].includes(shape.house);
+            const signSymbol = house
+              ? SIGN_SYMBOL?.[house.sign] || ""
+              : "";
 
-          return (
-            <g key={shape.house}>
-              <polygon
-                points={shape.points}
-                fill={isKendra ? "rgba(245,158,11,0.14)" : "rgba(245,158,11,0.04)"}
-                stroke="rgba(251,191,36,0.45)"
-                strokeWidth="1.5"
-              />
+            const planets = (house?.planets || []).map((planet) =>
+              String(planet).slice(0, 2)
+            );
 
-              <text
-                x={shape.x}
-                y={shape.y - 20}
-                textAnchor="middle"
-                fill="rgba(251,191,36,0.75)"
-                fontSize="10"
-                fontFamily="monospace"
-              >
-                H{shape.house}
-              </text>
+            const planetLines = [];
 
-              {house && (
-                <>
-                  <text
-                    x={shape.x}
-                    y={shape.y - 6}
-                    textAnchor="middle"
-                    fill="#fcd34d"
-                    fontSize="12"
-                    fontWeight="600"
-                  >
-                    {signSymbol} {house.sign}
-                  </text>
+            for (let index = 0; index < planets.length; index += 3) {
+              planetLines.push(planets.slice(index, index + 3).join(" "));
+            }
 
-                  <text
-                    x={shape.x}
-                    y={shape.y + 12}
-                    textAnchor="middle"
-                    fill="#e2e8f0"
-                    fontSize="11"
-                    fontFamily="monospace"
-                  >
-                    {planetLines.map((line, index) => (
-                      <tspan
-                        key={`${shape.house}-${index}`}
-                        x={shape.x}
-                        dy={index === 0 ? 0 : 14}
-                      >
-                        {line}
-                      </tspan>
-                    ))}
-                  </text>
-                </>
-              )}
-
-              {shape.house === 1 && (
+            return (
+              <g key={number}>
                 <text
-                  x={shape.x}
-                  y={shape.y + 38}
+                  x={position.x}
+                  y={position.y - 20}
                   textAnchor="middle"
-                  fill="rgba(251,191,36,0.6)"
-                  fontSize="9"
-                  fontStyle="italic"
+                  fill="rgba(251,191,36,0.75)"
+                  fontSize="10"
+                  fontFamily="monospace"
                 >
-                  Lagna
+                  H{number}
                 </text>
-              )}
-            </g>
-          );
-        })}
 
+                {house && (
+                  <>
+                    <text
+                      x={position.x}
+                      y={position.y - 6}
+                      textAnchor="middle"
+                      fill="#fcd34d"
+                      fontSize="12"
+                      fontWeight="600"
+                    >
+                      {signSymbol} {house.sign}
+                    </text>
+
+                    <text
+                      x={position.x}
+                      y={position.y + 14}
+                      textAnchor="middle"
+                      fill="#e2e8f0"
+                      fontSize="11"
+                      fontFamily="monospace"
+                    >
+                      {planetLines.map((line, index) => (
+                        <tspan
+                          key={`${number}-${index}`}
+                          x={position.x}
+                          dy={index === 0 ? 0 : 14}
+                        >
+                          {line}
+                        </tspan>
+                      ))}
+                    </text>
+                  </>
+                )}
+
+                {number === 1 && (
+                  <text
+                    x={position.x}
+                    y={position.y + 42}
+                    textAnchor="middle"
+                    fill="rgba(251,191,36,0.6)"
+                    fontSize="9"
+                    fontStyle="italic"
+                  >
+                    Lagna
+                  </text>
+                )}
+              </g>
+            );
+          }
+        )}
+
+        {/* Center marker */}
         <circle
           cx="200"
           cy="200"
