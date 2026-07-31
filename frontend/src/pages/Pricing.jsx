@@ -57,7 +57,7 @@ export default function Pricing() {
     basic_questions: [
       "Chat option available",
       "Call option available",
-      "Response within 24 hours",
+      "Quick Response within 24 hours",
       "Vedic (Parashari) analysis",
     ],
     detailed_reading: [
@@ -129,7 +129,7 @@ export default function Pricing() {
         Personal readings with <span className="text-gold italic">Acharya Akash</span>.
       </h1>
       <p className="text-slate-400 max-w-2xl mb-14">
-        Choose the reading that fits your moment. Pay by card (Stripe) or directly via UPI.
+        Choose the reading that fits your moment. Pay directly via UPI.
       </p>
 
       <div className="grid md:grid-cols-2 gap-8">
