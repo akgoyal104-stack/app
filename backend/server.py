@@ -46,7 +46,7 @@ security = HTTPBearer(auto_error=False)
 # ================= Server-side Packages =================
 PACKAGES: Dict[str, Dict[str, Any]] = {
     "basic_questions": {
-        "name": "Basic Questions",
+        "name": "Marriage, Love, Career, Health",
         "amount": 299.0,
         "currency": "inr",
         "mode": "payment",
