@@ -82,7 +82,7 @@ export default function Dashboard() {
               <Sparkles className="w-6 h-6 text-gold mb-3" />
               <h3 className="text-2xl font-serif-display text-white">Personal consultation</h3>
               <p className="text-slate-400 mt-2 mb-4">
-                Basic questions from ₹499 · Detailed reading with PDF & call ₹999.
+                Basic questions to Detailed reading 
               </p>
               <Link to="/pricing"><Button data-testid="dash-book" className="bg-gold text-black hover:bg-amber-300 rounded-full">Book with Acharya Akash</Button></Link>
             </CardContent>
