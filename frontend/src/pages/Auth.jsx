@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import { Sparkles, Mail, Smartphone, ArrowLeft } from "lucide-react";
 
 function EmailAuthForm({ mode, setMode, done }) {
-  const { login, signup } = useAuth();
+  const { login, signup } = useAuth(); 
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [loading, setLoading] = useState(false);
 
