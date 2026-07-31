@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { api } from "@/lib/api";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/context/AuthContext"; 
 import { toast } from "sonner";
 import { PROFILE, whatsappLink } from "@/components/Footer";
 import { Loader2, Check, MessageCircle, Phone, Copy, QrCode, CheckCircle2, Upload, X } from "lucide-react";
