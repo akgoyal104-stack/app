@@ -75,8 +75,8 @@ const NORTH_INDIAN_HOUSES = {
   },
   11: {
     points: "380,20 380,200 290,110",
-    box: { x: 278, y: 96, width: 94, height: 78 },
-    columns: 2,
+    box: { x: 342, y: 72, width: 30, height: 96 },
+    columns: 1,
   },
   12: {
     points: "200,20 380,20 290,110",
