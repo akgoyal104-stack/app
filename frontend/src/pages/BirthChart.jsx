@@ -848,9 +848,6 @@ function ChartVisual({ data }) {
   );
 }
 
-export default function BirthChart({ data }) {
-  return <ChartVisual data={data} />;
-}
 
 function PlanetsTable({ planets }) {
   return (
