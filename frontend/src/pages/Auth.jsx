@@ -77,7 +77,7 @@ function PhoneAuthForm({ done }) {
     setLoading(true);
     try {
       const r = await api.post("/auth/phone/send-otp", { phone });
-      toast.success(`Demo OTP: ${r.data.demo_otp}`, { duration: 8000 });
+      toast.success(`OTP: ${r.data.demo_otp}`, { duration: 8000 });
       setOtp(r.data.demo_otp);   // pre-fill for demo convenience
       setStep("otp");
     } catch (err) {
