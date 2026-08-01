@@ -157,6 +157,10 @@ function normalizeText(value) {
 }
 
 function getRashiNumber(sign) {
+  if (typeof sign === "object" && sign !== null) {
+    sign = sign.number || sign.value || sign.name || sign.sign;
+  }
+
   if (typeof sign === "number") {
     return sign >= 1 && sign <= 12 ? sign : "";
   }
@@ -178,12 +182,56 @@ function getRashiNumber(sign) {
 function getPlanetAbbreviation(planet) {
   const value =
     typeof planet === "object"
-      ? planet?.abbreviation || planet?.name || planet?.planet
+      ? planet?.abbreviation || planet?.abbr || planet?.name || planet?.planet
       : planet;
 
   const normalized = normalizeText(value);
 
-  return PLANET_ABBREVIATIONS[normalized] || String(value || "").trim().slice(0, 2);
+  return (
+    PLANET_ABBREVIATIONS[normalized] ||
+    String(value || "").trim().slice(0, 2)
+  );
+}
+
+function getHouseNumber(house, fallbackNumber) {
+  const value =
+    house?.house ??
+    house?.houseNumber ??
+    house?.house_number ??
+    house?.number ??
+    fallbackNumber;
+
+  const number = Number(value);
+
+  return Number.isFinite(number) ? number : fallbackNumber;
+}
+
+function getHousePlanets(house) {
+  const source =
+    house?.planets ??
+    house?.planet ??
+    house?.occupants ??
+    house?.bodies ??
+    [];
+
+  if (Array.isArray(source)) {
+    return source.map(getPlanetAbbreviation).filter(Boolean);
+  }
+
+  if (typeof source === "string") {
+    return source
+      .split(/[,\s]+/)
+      .map(getPlanetAbbreviation)
+      .filter(Boolean);
+  }
+
+  if (source && typeof source === "object") {
+    return Object.values(source)
+      .map(getPlanetAbbreviation)
+      .filter(Boolean);
+  }
+
+  return [];
 }
 
 function parsePoints(points) {
@@ -208,42 +256,46 @@ function getPolygonCenter(points) {
   };
 }
 
+function getInwardDirection(layout) {
+  const center = getPolygonCenter(parsePoints(layout.points));
+
+  const direction = {
+    x: 200 - center.x,
+    y: 200 - center.y,
+  };
+
+  const length = Math.hypot(direction.x, direction.y);
+
+  return {
+    center,
+    inward: {
+      x: length ? direction.x / length : 0,
+      y: length ? direction.y / length : -1,
+    },
+  };
+}
+
 function getHouseLabelPositions(layout) {
-  const points = parsePoints(layout.points);
-  const houseCenter = getPolygonCenter(points);
-
-  const directionToChartCenter = {
-    x: 200 - houseCenter.x,
-    y: 200 - houseCenter.y,
-  };
-
-  const directionLength = Math.hypot(
-    directionToChartCenter.x,
-    directionToChartCenter.y
-  );
-
-  const inward = {
-    x: directionLength === 0 ? 0 : directionToChartCenter.x / directionLength,
-    y: directionLength === 0 ? -1 : directionToChartCenter.y / directionLength,
-  };
-
-  const houseNumberOffset = 18;
-  const rashiOffset = 12;
+  const { center, inward } = getInwardDirection(layout);
 
   return {
     houseNumber: {
-      x: houseCenter.x - inward.x * houseNumberOffset,
-      y: houseCenter.y - inward.y * houseNumberOffset,
+      x: center.x - inward.x * 18,
+      y: center.y - inward.y * 18,
     },
     rashi: {
-      x: houseCenter.x + inward.x * rashiOffset,
-      y: houseCenter.y + inward.y * rashiOffset,
+      x: center.x + inward.x * 12,
+      y: center.y + inward.y * 12,
     },
   };
 }
 
 function makePlanetRows(planets, preferredColumns) {
-  const columns = Math.max(1, Math.min(preferredColumns || 2, planets.length));
+  const columns = Math.max(
+    1,
+    Math.min(preferredColumns || 2, planets.length)
+  );
+
   const rows = [];
 
   for (let index = 0; index < planets.length; index += columns) {
@@ -254,18 +306,25 @@ function makePlanetRows(planets, preferredColumns) {
 }
 
 function estimatePlanetWidth(label, fontSize) {
-  return Math.max(fontSize * 1.25, String(label).length * fontSize * 0.62);
+  return Math.max(
+    fontSize * 1.25,
+    String(label).length * fontSize * 0.62
+  );
 }
 
 function getAstroSagePlanetPacking(planets, layout) {
   const box = layout.box;
-  const maximumWidth = Math.max(36, box.width - 8);
-  const maximumHeight = Math.max(20, box.height - 6);
+  const maximumWidth = Math.max(36, box.width - 18);
+  const maximumHeight = Math.max(20, box.height - 18);
   const preferredColumns = Math.min(layout.columns || 2, planets.length);
   const fontSizes = [11, 10, 9, 8];
 
   for (const fontSize of fontSizes) {
-    for (let columns = preferredColumns; columns >= 1; columns -= 1) {
+    for (
+      let columns = preferredColumns;
+      columns >= 1;
+      columns -= 1
+    ) {
       const rows = makePlanetRows(planets, columns);
       const gap = fontSize >= 10 ? 7 : 5;
       const lineHeight = fontSize + 3;
@@ -283,7 +342,10 @@ function getAstroSagePlanetPacking(planets, layout) {
       const widestRow = Math.max(...rowWidths);
       const totalHeight = rows.length * lineHeight;
 
-      if (widestRow <= maximumWidth && totalHeight <= maximumHeight) {
+      if (
+        widestRow <= maximumWidth &&
+        totalHeight <= maximumHeight
+      ) {
         return {
           rows,
           fontSize,
@@ -312,13 +374,33 @@ function renderAstroSagePlanets({ planets, layout, houseNumber }) {
     return null;
   }
 
-  const box = layout.box;
-  const packing = getAstroSagePlanetPacking(planets, layout);
-  const centerX = box.x + box.width / 2;
-  const firstY = box.y + box.height - packing.totalHeight + packing.lineHeight / 2 - 2;
+  const triangleHouses = [2, 3, 5, 6, 8, 9, 11, 12];
+  const isTriangleHouse = triangleHouses.includes(houseNumber);
+
+  const packingLayout = isTriangleHouse
+    ? { ...layout, columns: 1 }
+    : layout;
+
+  const packing = getAstroSagePlanetPacking(
+    planets,
+    packingLayout
+  );
+
+  const { center, inward } = getInwardDirection(layout);
+
+  const centerX = center.x;
+  const centerY = center.y;
+
+  const inwardDistance = isTriangleHouse ? 48 : 30;
+  const rowStep = packing.lineHeight + 2;
+  const totalRowsHeight =
+    (packing.rows.length - 1) * rowStep;
 
   return (
-    <g aria-label={`Planets in house ${houseNumber}`} pointerEvents="none">
+    <g
+      aria-label={`Planets in house ${houseNumber}`}
+      pointerEvents="none"
+    >
       {packing.rows.map((row, rowIndex) => {
         const rowWidth = row.reduce(
           (width, planet, planetIndex) =>
@@ -328,15 +410,30 @@ function renderAstroSagePlanets({ planets, layout, houseNumber }) {
           0
         );
 
-        let currentX = centerX - rowWidth / 2;
+        const rowOffset =
+          rowIndex * rowStep - totalRowsHeight / 2;
+
+        const rowCenterX =
+          centerX + inward.x * inwardDistance -
+          inward.y * rowOffset;
+
+        const rowCenterY =
+          centerY + inward.y * inwardDistance +
+          inward.x * rowOffset;
+
+        let currentX = rowCenterX - rowWidth / 2;
 
         return (
           <g
             key={`${houseNumber}-planet-row-${rowIndex}`}
-            transform={`translate(0, ${firstY + rowIndex * packing.lineHeight})`}
+            transform={`translate(0, ${rowCenterY})`}
           >
             {row.map((planet, planetIndex) => {
-              const planetWidth = estimatePlanetWidth(planet, packing.fontSize);
+              const planetWidth = estimatePlanetWidth(
+                planet,
+                packing.fontSize
+              );
+
               const planetX = currentX + planetWidth / 2;
               currentX += planetWidth + packing.gap;
 
@@ -344,7 +441,7 @@ function renderAstroSagePlanets({ planets, layout, houseNumber }) {
                 <text
                   key={`${houseNumber}-${rowIndex}-${planetIndex}`}
                   x={planetX}
-                  y="0"
+                  y={0}
                   textAnchor="middle"
                   dominantBaseline="middle"
                   fill="#e2e8f0"
@@ -364,9 +461,20 @@ function renderAstroSagePlanets({ planets, layout, houseNumber }) {
 }
 
 function ChartVisual({ data }) {
-  const houses = Array.isArray(data?.houses) ? data.houses : [];
+  const rawHouses = data?.houses;
 
-  const houseByNumber = new Map(houses.map((house) => [Number(house.house), house]));
+  const houses = Array.isArray(rawHouses)
+    ? rawHouses
+    : rawHouses && typeof rawHouses === "object"
+      ? Object.values(rawHouses)
+      : [];
+
+  const houseByNumber = new Map(
+    houses.map((house, index) => [
+      getHouseNumber(house, index + 1),
+      house,
+    ])
+  );
 
   return (
     <div className="relative w-full aspect-square max-w-md mx-auto">
@@ -377,18 +485,26 @@ function ChartVisual({ data }) {
         aria-label="North Indian Vedic birth chart"
       >
         <defs>
-          {Object.entries(NORTH_INDIAN_HOUSES).map(([houseNumber, house]) => (
-            <clipPath
-              key={houseNumber}
-              id={`north-indian-house-${houseNumber}`}
-              clipPathUnits="userSpaceOnUse"
-            >
-              <polygon points={house.points} />
-            </clipPath>
-          ))}
+          {Object.entries(NORTH_INDIAN_HOUSES).map(
+            ([houseNumber, house]) => (
+              <clipPath
+                key={houseNumber}
+                id={`north-indian-house-${houseNumber}`}
+                clipPathUnits="userSpaceOnUse"
+              >
+                <polygon points={house.points} />
+              </clipPath>
+            )
+          )}
         </defs>
 
-        <rect x="20" y="20" width="360" height="360" fill="rgba(0,0,0,0.4)" />
+        <rect
+          x="20"
+          y="20"
+          width="360"
+          height="360"
+          fill="rgba(0,0,0,0.4)"
+        />
 
         <rect
           x="20"
@@ -413,82 +529,99 @@ function ChartVisual({ data }) {
           shapeRendering="geometricPrecision"
         />
 
-        {Object.entries(NORTH_INDIAN_HOUSES).map(([houseNumber, layout]) => {
-          const number = Number(houseNumber);
-          const house = houseByNumber.get(number);
-          const labelPositions = getHouseLabelPositions(layout);
+        {Object.entries(NORTH_INDIAN_HOUSES).map(
+          ([houseNumber, layout]) => {
+            const number = Number(houseNumber);
+            const house = houseByNumber.get(number);
+            const labelPositions = getHouseLabelPositions(layout);
 
-          if (!house) {
-            return (
-              <text
-                key={number}
-                x={labelPositions.houseNumber.x}
-                y={labelPositions.houseNumber.y}
-                textAnchor="middle"
-                dominantBaseline="middle"
-                fill="rgba(251,191,36,0.75)"
-                fontSize="10"
-                fontFamily="monospace"
-              >
-                H{number}
-              </text>
-            );
-          }
-
-          const signNumber = getRashiNumber(house.sign ?? house.rashi);
-          const planets = (house.planets || []).map(getPlanetAbbreviation).filter(Boolean);
-
-          return (
-            <g key={number} clipPath={`url(#north-indian-house-${number})`}>
-              <text
-                x={labelPositions.houseNumber.x}
-                y={labelPositions.houseNumber.y}
-                textAnchor="middle"
-                dominantBaseline="middle"
-                fill="rgba(251,191,36,0.8)"
-                fontSize="10"
-                fontFamily="monospace"
-              >
-                H{number}
-              </text>
-
-              <text
-                x={labelPositions.rashi.x}
-                y={labelPositions.rashi.y}
-                textAnchor="middle"
-                dominantBaseline="middle"
-                fill="#fcd34d"
-                fontSize="24"
-                fontWeight="700"
-                fontFamily="sans-serif"
-              >
-                {signNumber}
-              </text>
-
-              {renderAstroSagePlanets({
-                planets,
-                layout,
-                houseNumber: number,
-              })}
-
-              {number === 1 && (
+            if (!house) {
+              return (
                 <text
-                  x="200"
-                  y="184"
+                  key={number}
+                  x={labelPositions.houseNumber.x}
+                  y={labelPositions.houseNumber.y}
                   textAnchor="middle"
                   dominantBaseline="middle"
-                  fill="rgba(251,191,36,0.65)"
+                  fill="rgba(251,191,36,0.75)"
                   fontSize="10"
-                  fontStyle="italic"
+                  fontFamily="monospace"
                 >
-                  Lagna
+                  H{number}
                 </text>
-              )}
-            </g>
-          );
-        })}
+              );
+            }
 
-        <circle cx="200" cy="200" r="4" fill="#fbbf24" stroke="#78350f" strokeWidth="1" />
+            const signNumber = getRashiNumber(
+              house.sign ??
+                house.rashi ??
+                house.signNumber ??
+                house.sign_number
+            );
+
+            const planets = getHousePlanets(house);
+
+            return (
+              <g key={number}>
+                <g clipPath={`url(#north-indian-house-${number})`}>
+                  <text
+                    x={labelPositions.houseNumber.x}
+                    y={labelPositions.houseNumber.y}
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                    fill="rgba(251,191,36,0.8)"
+                    fontSize="10"
+                    fontFamily="monospace"
+                  >
+                    H{number}
+                  </text>
+
+                  <text
+                    x={labelPositions.rashi.x}
+                    y={labelPositions.rashi.y}
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                    fill="#fcd34d"
+                    fontSize="24"
+                    fontWeight="700"
+                    fontFamily="sans-serif"
+                  >
+                    {signNumber}
+                  </text>
+
+                  {number === 1 && (
+                    <text
+                      x="200"
+                      y="184"
+                      textAnchor="middle"
+                      dominantBaseline="middle"
+                      fill="rgba(251,191,36,0.65)"
+                      fontSize="10"
+                      fontStyle="italic"
+                    >
+                      Lagna
+                    </text>
+                  )}
+                </g>
+
+                {renderAstroSagePlanets({
+                  planets,
+                  layout,
+                  houseNumber: number,
+                })}
+              </g>
+            );
+          }
+        )}
+
+        <circle
+          cx="200"
+          cy="200"
+          r="4"
+          fill="#fbbf24"
+          stroke="#78350f"
+          strokeWidth="1"
+        />
 
         <text
           x="200"
