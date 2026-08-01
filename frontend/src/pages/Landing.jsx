@@ -102,7 +102,7 @@ export default function Landing() {
           <img
             src="https://res.cloudinary.com/tby6thdx/image/upload/v1785525582/IMG_0664_ailxkm.jpg"
             alt="Acharya Akash additional image"
-            className="h-[440px] w-full object-cover object-top"
+            className="h-[440px] w-full object-cover object-center"
           />
 
           <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent p-6">
