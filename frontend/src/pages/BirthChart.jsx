@@ -23,73 +23,19 @@ function renderMarkdown(text = "") {
 }
 
 
-const CHART_SIZE = 400;
-const BORDER = 20;
-const PLANET_FONT_SIZE = 10;
-const PLANET_LINE_HEIGHT = 12;
-const RASHI_FONT_SIZE = 20;
-
 const NORTH_INDIAN_HOUSES = {
-  1: {
-    points: "200,20 290,110 200,200 110,110",
-    box: { x: 132, y: 136, width: 136, height: 42 },
-    columns: 4,
-  },
-  2: {
-    points: "20,20 200,20 110,110",
-    box: { x: 48, y: 70, width: 124, height: 34 },
-    columns: 3,
-  },
-  3: {
-    points: "20,20 110,110 20,200",
-    box: { x: 28, y: 116, width: 72, height: 76 },
-    columns: 1,
-  },
-  4: {
-    points: "20,200 110,110 200,200 110,290",
-    box: { x: 48, y: 218, width: 124, height: 52 },
-    columns: 3,
-  },
-  5: {
-    points: "20,200 110,290 20,380",
-    box: { x: 28, y: 300, width: 72, height: 76 },
-    columns: 1,
-  },
-  6: {
-    points: "20,380 200,380 110,290",
-    box: { x: 48, y: 346, width: 124, height: 28 },
-    columns: 3,
-  },
-  7: {
-    points: "110,290 200,200 290,290 200,380",
-    box: { x: 132, y: 344, width: 136, height: 28 },
-    columns: 4,
-  },
-  8: {
-    points: "200,380 380,380 290,290",
-    box: { x: 228, y: 346, width: 124, height: 28 },
-    columns: 3,
-  },
-  9: {
-    points: "380,200 380,380 290,290",
-    box: { x: 300, y: 300, width: 72, height: 76 },
-    columns: 1,
-  },
-  10: {
-    points: "380,200 290,110 200,200 290,290",
-    box: { x: 228, y: 218, width: 124, height: 52 },
-    columns: 3,
-  },
-  11: {
-    points: "380,20 380,200 290,110",
-    box: { x: 318, y: 108, width: 48, height: 84 },
-    columns: 1,
-  },
-  12: {
-    points: "200,20 380,20 290,110",
-    box: { x: 228, y: 70, width: 124, height: 34 },
-    columns: 3,
-  },
+  1: { points: "200,20 290,110 200,200 110,110" },
+  2: { points: "20,20 200,20 110,110" },
+  3: { points: "20,20 110,110 20,200" },
+  4: { points: "20,200 110,110 200,200 110,290" },
+  5: { points: "20,200 110,290 20,380" },
+  6: { points: "20,380 200,380 110,290" },
+  7: { points: "110,290 200,200 290,290 200,380" },
+  8: { points: "200,380 380,380 290,290" },
+  9: { points: "380,200 380,380 290,290" },
+  10: { points: "380,200 290,110 200,200 290,290" },
+  11: { points: "380,20 380,200 290,110" },
+  12: { points: "200,20 380,20 290,110" },
 };
 
 const NORTH_INDIAN_LINES = `
@@ -153,309 +99,163 @@ const PLANET_ABBREVIATIONS = {
   shani: "Sa",
   rahu: "Ra",
   ketu: "Ke",
-  pluto: "Pl",
-  uranus: "Ur",
-  neptune: "Ne",
   ascendant: "As",
   lagna: "As",
 };
 
+/*
+  These are fixed AstroSage-style safe zones.
+
+  house = house number position
+  rashi = zodiac sign number position
+  planets = planet label position
+*/
+const HOUSE_LAYOUT = {
+  1: {
+    house: { x: 200, y: 55 },
+    rashi: { x: 200, y: 88 },
+    planets: { x: 200, y: 143, columns: 3 },
+  },
+  2: {
+    house: { x: 102, y: 52 },
+    rashi: { x: 102, y: 80 },
+    planets: { x: 72, y: 30, columns: 3 },
+  },
+  3: {
+    house: { x: 52, y: 90 },
+    rashi: { x: 52, y: 120 },
+    planets: { x: 50, y: 75, columns: 2 },
+  },
+  4: {
+    house: { x: 84, y: 181 },
+    rashi: { x: 84, y: 211 },
+    planets: { x: 75, y: 200, columns: 2 },
+  },
+  5: {
+    house: { x: 52, y: 258 },
+    rashi: { x: 52, y: 288 },
+    planets: { x: 48, y: 310, columns: 2 },
+  },
+  6: {
+    house: { x: 104, y: 320 },
+    rashi: { x: 104, y: 340 },
+    planets: { x: 90, y: 360, columns: 3 },
+  },
+  7: {
+    house: { x: 200, y: 327 },
+    rashi: { x: 200, y: 295 },
+    planets: { x: 180, y: 246, columns: 3 },
+  },
+  8: {
+    house: { x: 295, y: 326 },
+    rashi: { x: 295, y: 352 },
+    planets: { x: 275, y: 365, columns: 3 },
+  },
+  9: {
+    house: { x: 348, y: 258 },
+    rashi: { x: 348, y: 288 },
+    planets: { x: 352, y: 254, columns: 1 },
+  },
+  10: {
+    house: { x: 288, y: 181 },
+    rashi: { x: 288, y: 211 },
+    planets: { x: 300, y: 200, columns: 2 },
+  },
+  11: {
+    house: { x: 348, y: 90 },
+    rashi: { x: 348, y: 120 },
+    planets: { x: 353, y: 75, columns: 1 },
+  },
+  12: {
+    house: { x: 298, y: 48 },
+    rashi: { x: 298, y: 76 },
+    planets: { x: 274, y: 38, columns: 3 },
+  },
+};
+
 function normalizeText(value) {
-  return String(value ?? "")
+  return String(value || "")
     .trim()
     .toLowerCase()
     .replace(/[\s_-]+/g, "");
 }
 
-function getNumberFromValue(value) {
-  if (typeof value === "number") {
-    return Number.isFinite(value) ? value : "";
-  }
-
-  const text = String(value ?? "").trim();
-
-  if (!text) {
-    return "";
-  }
-
-  const directNumber = Number(text);
-
-  if (Number.isFinite(directNumber)) {
-    return directNumber;
-  }
-
-  const match = text.match(/\d+/);
-
-  return match ? Number(match[0]) : "";
-}
-
 function getRashiNumber(value) {
-  const numericValue = getNumberFromValue(value);
+  const rawValue =
+    value && typeof value === "object"
+      ? value.number ?? value.name ?? value.sign
+      : value;
 
-  if (numericValue >= 1 && numericValue <= 12) {
+  if (typeof rawValue === "number") {
+    return rawValue >= 1 && rawValue <= 12 ? rawValue : "";
+  }
+
+  const numericValue = Number(rawValue);
+
+  if (
+    String(rawValue).trim() !== "" &&
+    Number.isFinite(numericValue) &&
+    numericValue >= 1 &&
+    numericValue <= 12
+  ) {
     return numericValue;
   }
 
-  return RASHI_NUMBERS[normalizeText(value)] || "";
+  return RASHI_NUMBERS[normalizeText(rawValue)] || "";
 }
 
-function getPlanetAbbreviation(planet, fallback = "") {
-  if (planet === null || planet === undefined) {
-    return fallback;
-  }
+function getPlanetAbbreviation(planet) {
+  const value =
+    planet && typeof planet === "object"
+      ? planet.abbreviation ??
+        planet.abbr ??
+        planet.name ??
+        planet.planet ??
+        planet.planet_name
+      : planet;
 
-  if (typeof planet === "object") {
-    const value =
-      planet.abbreviation ??
-      planet.abbr ??
-      planet.shortName ??
-      planet.name ??
-      planet.planet ??
-      planet.graha ??
-      planet.body ??
-      fallback;
+  const cleanValue = String(value || "").trim();
 
-    return getPlanetAbbreviation(value, fallback);
-  }
-
-  const text = String(planet).trim();
-
-  if (!text) {
-    return fallback;
-  }
-
-  const normalized = normalizeText(text);
-
-  if (PLANET_ABBREVIATIONS[normalized]) {
-    return PLANET_ABBREVIATIONS[normalized];
-  }
-
-  const abbreviationMatch = text.match(/\(([A-Za-z]{1,3})\)/);
-
-  if (abbreviationMatch) {
-    return abbreviationMatch[1];
-  }
-
-  return text;
-}
-
-function getHouseNumber(house, fallbackNumber) {
-  if (!house || typeof house !== "object") {
-    return fallbackNumber;
-  }
-
-  const possibleValues = [
-    house.house,
-    house.houseNumber,
-    house.house_number,
-    house.houseNo,
-    house.house_no,
-    house.bhava,
-    house.bhavaNumber,
-    house.number,
-  ];
-
-  for (const value of possibleValues) {
-    const number = getNumberFromValue(value);
-
-    if (number >= 1 && number <= 12) {
-      return number;
-    }
-  }
-
-  return fallbackNumber;
-}
-
-function getHouseSign(house) {
-  if (!house || typeof house !== "object") {
+  if (!cleanValue) {
     return "";
   }
 
   return (
-    house.sign ??
-    house.rashi ??
-    house.signNumber ??
-    house.sign_number ??
-    house.rashiNumber ??
-    house.rashi_number ??
-    house.signNo ??
-    house.rashiNo ??
-    ""
+    PLANET_ABBREVIATIONS[normalizeText(cleanValue)] ||
+    cleanValue.slice(0, 2)
   );
 }
 
-function getHousePlanets(house) {
-  if (!house || typeof house !== "object") {
-    return [];
-  }
-
+function getPlanetsFromHouse(house) {
   const source =
-    house.planets ??
-    house.planet ??
-    house.grahas ??
-    house.occupants ??
-    house.bodies ??
-    house.planetNames ??
-    house.planet_names ??
-    house.planetaryPositions ??
-    [];
+    Array.isArray(house?.planets) && house.planets.length > 0
+      ? house.planets
+      : house?.planet_names ??
+        house?.planetNames ??
+        house?.planets ??
+        house?.planet ??
+        [];
 
   if (Array.isArray(source)) {
-    return source.map((planet, index) =>
-      getPlanetAbbreviation(planet, `P${index + 1}`)
-    );
+    return source.map(getPlanetAbbreviation).filter(Boolean);
   }
 
-  if (typeof source === "string") {
-    return source
-      .split(/[,\s]+/)
-      .map((planet, index) =>
-        getPlanetAbbreviation(planet, `P${index + 1}`)
-      );
-  }
-
-  if (source && typeof source === "object") {
-    return Object.entries(source).map(([key, value], index) =>
-      getPlanetAbbreviation(value, getPlanetAbbreviation(key, `P${index + 1}`))
-    );
-  }
-
-  return [];
+  return [getPlanetAbbreviation(source)].filter(Boolean);
 }
 
-function normalizeHouses(data) {
-  const source =
-    data?.houses ??
-    data?.chart?.houses ??
-    data?.birthChart?.houses ??
-    [];
-
-  const result = [];
-
-  if (Array.isArray(source)) {
-    source.forEach((house, index) => {
-      const normalizedHouse =
-        house && typeof house === "object" ? house : { sign: house };
-
-      result.push({
-        ...normalizedHouse,
-        house: getHouseNumber(normalizedHouse, index + 1),
-      });
-    });
-
-    return result;
-  }
-
-  if (source && typeof source === "object") {
-    Object.entries(source).forEach(([key, value]) => {
-      const fallbackNumber = getNumberFromValue(key);
-      const normalizedHouse =
-        value && typeof value === "object" ? value : { sign: value };
-
-      const houseNumber = getHouseNumber(
-        normalizedHouse,
-        fallbackNumber
-      );
-
-      if (houseNumber >= 1 && houseNumber <= 12) {
-        result.push({
-          ...normalizedHouse,
-          house: houseNumber,
-        });
-      }
-    });
-  }
-
-  return result;
-}
-
-function parsePoints(points) {
-  return points.split(/\s+/).map((point) => {
-    const [x, y] = point.split(",").map(Number);
-    return { x, y };
-  });
-}
-
-function getPolygonCenter(points) {
-  const total = points.reduce(
-    (sum, point) => ({
-      x: sum.x + point.x,
-      y: sum.y + point.y,
-    }),
-    { x: 0, y: 0 }
-  );
-
-  return {
-    x: total.x / points.length,
-    y: total.y / points.length,
-  };
-}
-
-function getRashiPosition(layout) {
-  const center = getPolygonCenter(parsePoints(layout.points));
-  const direction = {
-    x: 200 - center.x,
-    y: 200 - center.y,
-  };
-
-  const length = Math.hypot(direction.x, direction.y);
-
-  if (length === 0) {
-    return center;
-  }
-
-  const inwardDistance = 10;
-
-  return {
-    x: center.x + (direction.x / length) * inwardDistance,
-    y: center.y + (direction.y / length) * inwardDistance,
-  };
-}
-
-function estimatePlanetWidth(label) {
-  return Math.max(
-    PLANET_FONT_SIZE * 1.2,
-    String(label).length * PLANET_FONT_SIZE * 0.62
-  );
-}
-
-function getPlanetRows(planets, layout) {
-  const preferredColumns = Math.max(
+function makePlanetRows(planets, columns) {
+  const safeColumns = Math.max(
     1,
-    Math.min(layout.columns || 1, planets.length)
+    Math.min(columns || 1, planets.length)
   );
 
-  const availableWidth = layout.box.width - 4;
+  const rows = [];
 
-  for (
-    let columns = preferredColumns;
-    columns >= 1;
-    columns -= 1
-  ) {
-    const rows = [];
-
-    for (let index = 0; index < planets.length; index += columns) {
-      rows.push(planets.slice(index, index + columns));
-    }
-
-    const fits = rows.every((row) => {
-      const width = row.reduce(
-        (total, planet, index) =>
-          total +
-          estimatePlanetWidth(planet) +
-          (index === 0 ? 0 : 3),
-        0
-      );
-
-      return width <= availableWidth;
-    });
-
-    if (fits) {
-      return rows;
-    }
+  for (let index = 0; index < planets.length; index += safeColumns) {
+    rows.push(planets.slice(index, index + safeColumns));
   }
 
-  return planets.map((planet) => [planet]);
+  return rows;
 }
 
 function renderPlanets({ planets, layout, houseNumber }) {
@@ -463,13 +263,11 @@ function renderPlanets({ planets, layout, houseNumber }) {
     return null;
   }
 
-  const rows = getPlanetRows(planets, layout);
-  const box = layout.box;
-  const totalHeight = rows.length * PLANET_LINE_HEIGHT;
-  const firstY =
-    box.y +
-    (box.height - totalHeight) / 2 +
-    PLANET_LINE_HEIGHT / 2;
+  const zone = layout.planets;
+  const rows = makePlanetRows(planets, zone.columns);
+  const fontSize = planets.length >= 5 ? 8 : planets.length >= 3 ? 9 : 10;
+  const lineHeight = fontSize + 3;
+  const firstY = zone.y - ((rows.length - 1) * lineHeight) / 2;
 
   return (
     <g
@@ -477,82 +275,65 @@ function renderPlanets({ planets, layout, houseNumber }) {
       aria-label={`Planets in house ${houseNumber}`}
       pointerEvents="none"
     >
-      {rows.map((row, rowIndex) => {
-        const rowWidth = row.reduce(
-          (total, planet, index) =>
-            total +
-            estimatePlanetWidth(planet) +
-            (index === 0 ? 0 : 3),
-          0
-        );
-
-        let currentX = box.x + box.width / 2 - rowWidth / 2;
-
-        return (
-          <g
-            key={`planet-row-${houseNumber}-${rowIndex}`}
-            transform={`translate(0 ${
-              firstY + rowIndex * PLANET_LINE_HEIGHT
-            })`}
-          >
-            {row.map((planet, planetIndex) => {
-              const width = estimatePlanetWidth(planet);
-              const x = currentX + width / 2;
-
-              currentX += width + 3;
-
-              return (
-                <text
-                  key={`planet-${houseNumber}-${rowIndex}-${planetIndex}`}
-                  x={x}
-                  y="0"
-                  textAnchor="middle"
-                  dominantBaseline="middle"
-                  fill="#e2e8f0"
-                  fontSize={PLANET_FONT_SIZE}
-                  fontFamily="monospace"
-                  fontWeight="500"
-                >
-                  {planet}
-                </text>
-              );
-            })}
-          </g>
-        );
-      })}
+      {rows.map((row, rowIndex) => (
+        <text
+          key={`planet-row-${houseNumber}-${rowIndex}`}
+          x={zone.x}
+          y={firstY + rowIndex * lineHeight}
+          textAnchor="middle"
+          dominantBaseline="middle"
+          fill="#e2e8f0"
+          fontSize={fontSize}
+          fontFamily="monospace"
+          fontWeight="500"
+          letterSpacing="0"
+        >
+          {row.join("  ")}
+        </text>
+      ))}
     </g>
   );
 }
 
-export default function BirthChart({ data }) {
-  const houses = normalizeHouses(data);
+function ChartVisual({ data }) {
+  const houses = Array.isArray(data?.houses) ? data.houses : [];
 
   const houseByNumber = new Map(
-    houses.map((house) => [Number(house.house), house])
+    houses
+      .map((house, index) => {
+        const number = Number(
+          house?.house ?? house?.houseNumber ?? index + 1
+        );
+
+        return [number, house];
+      })
+      .filter(
+        ([number]) =>
+          Number.isInteger(number) && number >= 1 && number <= 12
+      )
   );
 
   return (
     <div className="relative mx-auto aspect-square w-full max-w-md">
       <svg
-        viewBox={`0 0 ${CHART_SIZE} ${CHART_SIZE}`}
+        viewBox="0 0 400 400"
         className="h-full w-full rounded-xl"
         role="img"
         aria-label="North Indian Vedic birth chart"
-        overflow="visible"
       >
         <rect
-          x={BORDER}
-          y={BORDER}
-          width={CHART_SIZE - BORDER * 2}
-          height={CHART_SIZE - BORDER * 2}
+          x="20"
+          y="20"
+          width="360"
+          height="360"
           fill="rgba(0,0,0,0.4)"
         />
 
         <rect
-          x={BORDER}
-          y={BORDER}
-          width={CHART_SIZE - BORDER * 2}
-          height={CHART_SIZE - BORDER * 2}
+          x="20"
+          y="20"
+          width="360"
+          height="360"
           fill="none"
           stroke="rgba(251,191,36,0.7)"
           strokeWidth="2"
@@ -572,37 +353,68 @@ export default function BirthChart({ data }) {
         />
 
         {Object.entries(NORTH_INDIAN_HOUSES).map(
-          ([houseKey, layout]) => {
-            const houseNumber = Number(houseKey);
-            const house = houseByNumber.get(houseNumber);
-            const signNumber = house
-              ? getRashiNumber(getHouseSign(house))
-              : "";
-            const planets = house ? getHousePlanets(house) : [];
-            const rashiPosition = getRashiPosition(layout);
+          ([houseNumber, houseShape]) => {
+            const number = Number(houseNumber);
+            const house = houseByNumber.get(number);
+            const layout = HOUSE_LAYOUT[number];
+
+            if (!house) {
+              return (
+                <text
+                  key={`empty-house-${number}`}
+                  x={layout.house.x}
+                  y={layout.house.y}
+                  textAnchor="middle"
+                  dominantBaseline="middle"
+                  fill="rgba(251,191,36,0.75)"
+                  fontSize="10"
+                  fontFamily="monospace"
+                >
+                  H{number}
+                </text>
+              );
+            }
+
+            const signNumber = getRashiNumber(
+              house.sign ??
+                house.rashi ??
+                house.signNumber ??
+                house.rashiNumber
+            );
+
+            const planets = getPlanetsFromHouse(house);
 
             return (
-              <g key={`house-${houseNumber}`}>
-                {signNumber !== "" && (
-                  <text
-                    x={rashiPosition.x}
-                    y={rashiPosition.y}
-                    textAnchor="middle"
-                    dominantBaseline="middle"
-                    fill="#fcd34d"
-                    fontSize={RASHI_FONT_SIZE}
-                    fontWeight="700"
-                    fontFamily="sans-serif"
-                    pointerEvents="none"
-                  >
-                    {signNumber}
-                  </text>
-                )}
+              <g key={`house-${number}`}>
+                <text
+                  x={layout.house.x}
+                  y={layout.house.y}
+                  textAnchor="middle"
+                  dominantBaseline="middle"
+                  fill="rgba(251,191,36,0.8)"
+                  fontSize="10"
+                  fontFamily="monospace"
+                >
+                  H{number}
+                </text>
+
+                <text
+                  x={layout.rashi.x}
+                  y={layout.rashi.y}
+                  textAnchor="middle"
+                  dominantBaseline="middle"
+                  fill="#fcd34d"
+                  fontSize="24"
+                  fontWeight="700"
+                  fontFamily="sans-serif"
+                >
+                  {signNumber}
+                </text>
 
                 {renderPlanets({
                   planets,
                   layout,
-                  houseNumber,
+                  houseNumber: number,
                 })}
               </g>
             );
@@ -611,16 +423,26 @@ export default function BirthChart({ data }) {
 
         <text
           x="200"
-          y="184"
+          y="181"
           textAnchor="middle"
           dominantBaseline="middle"
-          fill="rgba(251,191,36,0.7)"
+          fill="rgba(251,191,36,0.65)"
           fontSize="10"
-          fontFamily="sans-serif"
           fontStyle="italic"
-          pointerEvents="none"
         >
           Lagna
+        </text>
+
+        <text
+          x="200"
+          y="197"
+          textAnchor="middle"
+          dominantBaseline="middle"
+          fill="rgba(251,191,36,0.3)"
+          fontSize="9"
+          fontStyle="italic"
+        >
+          Kundali
         </text>
 
         <circle
