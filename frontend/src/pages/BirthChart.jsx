@@ -22,70 +22,72 @@ function renderMarkdown(text = "") {
   return { __html: html };
 }
 
+
 const CHART_SIZE = 400;
 const BORDER = 20;
-const RASHI_FONT_SIZE = 20;
 const PLANET_FONT_SIZE = 10;
+const PLANET_LINE_HEIGHT = 12;
+const RASHI_FONT_SIZE = 20;
 
 const NORTH_INDIAN_HOUSES = {
   1: {
     points: "200,20 290,110 200,200 110,110",
-    box: { x: 132, y: 145, width: 136, height: 32 },
+    box: { x: 132, y: 136, width: 136, height: 42 },
     columns: 4,
   },
   2: {
     points: "20,20 200,20 110,110",
-    box: { x: 58, y: 108, width: 104, height: 26 },
+    box: { x: 48, y: 70, width: 124, height: 34 },
     columns: 3,
   },
   3: {
     points: "20,20 110,110 20,200",
-    box: { x: 28, y: 128, width: 76, height: 62 },
-    columns: 2,
+    box: { x: 28, y: 116, width: 72, height: 76 },
+    columns: 1,
   },
   4: {
     points: "20,200 110,110 200,200 110,290",
-    box: { x: 58, y: 220, width: 104, height: 42 },
+    box: { x: 48, y: 218, width: 124, height: 52 },
     columns: 3,
   },
   5: {
     points: "20,200 110,290 20,380",
-    box: { x: 28, y: 300, width: 76, height: 62 },
-    columns: 2,
+    box: { x: 28, y: 300, width: 72, height: 76 },
+    columns: 1,
   },
   6: {
     points: "20,380 200,380 110,290",
-    box: { x: 58, y: 350, width: 104, height: 26 },
+    box: { x: 48, y: 346, width: 124, height: 28 },
     columns: 3,
   },
   7: {
     points: "110,290 200,200 290,290 200,380",
-    box: { x: 132, y: 350, width: 136, height: 26 },
+    box: { x: 132, y: 344, width: 136, height: 28 },
     columns: 4,
   },
   8: {
     points: "200,380 380,380 290,290",
-    box: { x: 238, y: 350, width: 104, height: 26 },
+    box: { x: 228, y: 346, width: 124, height: 28 },
     columns: 3,
   },
   9: {
     points: "380,200 380,380 290,290",
-    box: { x: 296, y: 300, width: 76, height: 62 },
-    columns: 2,
+    box: { x: 300, y: 300, width: 72, height: 76 },
+    columns: 1,
   },
   10: {
     points: "380,200 290,110 200,200 290,290",
-    box: { x: 238, y: 220, width: 104, height: 42 },
+    box: { x: 228, y: 218, width: 124, height: 52 },
     columns: 3,
   },
   11: {
     points: "380,20 380,200 290,110",
-    box: { x: 328, y: 128, width: 44, height: 62 },
-    columns: 2,
+    box: { x: 318, y: 108, width: 48, height: 84 },
+    columns: 1,
   },
   12: {
     points: "200,20 380,20 290,110",
-    box: { x: 238, y: 108, width: 104, height: 26 },
+    box: { x: 228, y: 70, width: 124, height: 34 },
     columns: 3,
   },
 };
@@ -197,11 +199,13 @@ function getRashiNumber(value) {
   return RASHI_NUMBERS[normalizeText(value)] || "";
 }
 
-function getPlanetAbbreviation(planet) {
-  let value = planet;
+function getPlanetAbbreviation(planet, fallback = "") {
+  if (planet === null || planet === undefined) {
+    return fallback;
+  }
 
-  if (planet && typeof planet === "object") {
-    value =
+  if (typeof planet === "object") {
+    const value =
       planet.abbreviation ??
       planet.abbr ??
       planet.shortName ??
@@ -209,13 +213,15 @@ function getPlanetAbbreviation(planet) {
       planet.planet ??
       planet.graha ??
       planet.body ??
-      "";
+      fallback;
+
+    return getPlanetAbbreviation(value, fallback);
   }
 
-  const text = String(value ?? "").trim();
+  const text = String(planet).trim();
 
   if (!text) {
-    return "";
+    return fallback;
   }
 
   const normalized = normalizeText(text);
@@ -230,7 +236,7 @@ function getPlanetAbbreviation(planet) {
     return abbreviationMatch[1];
   }
 
-  return text.slice(0, 2);
+  return text;
 }
 
 function getHouseNumber(house, fallbackNumber) {
@@ -283,7 +289,7 @@ function getHousePlanets(house) {
     return [];
   }
 
-  const value =
+  const source =
     house.planets ??
     house.planet ??
     house.grahas ??
@@ -294,21 +300,24 @@ function getHousePlanets(house) {
     house.planetaryPositions ??
     [];
 
-  if (Array.isArray(value)) {
-    return value.map(getPlanetAbbreviation).filter(Boolean);
+  if (Array.isArray(source)) {
+    return source.map((planet, index) =>
+      getPlanetAbbreviation(planet, `P${index + 1}`)
+    );
   }
 
-  if (typeof value === "string") {
-    return value
+  if (typeof source === "string") {
+    return source
       .split(/[,\s]+/)
-      .map(getPlanetAbbreviation)
-      .filter(Boolean);
+      .map((planet, index) =>
+        getPlanetAbbreviation(planet, `P${index + 1}`)
+      );
   }
 
-  if (value && typeof value === "object") {
-    return Object.values(value)
-      .map(getPlanetAbbreviation)
-      .filter(Boolean);
+  if (source && typeof source === "object") {
+    return Object.entries(source).map(([key, value], index) =>
+      getPlanetAbbreviation(value, getPlanetAbbreviation(key, `P${index + 1}`))
+    );
   }
 
   return [];
@@ -324,18 +333,14 @@ function normalizeHouses(data) {
   const result = [];
 
   if (Array.isArray(source)) {
-    source.forEach((value, index) => {
-      const house =
-        value && typeof value === "object" ? value : { sign: value };
+    source.forEach((house, index) => {
+      const normalizedHouse =
+        house && typeof house === "object" ? house : { sign: house };
 
-      const number = getHouseNumber(house, index + 1);
-
-      if (number >= 1 && number <= 12) {
-        result.push({
-          ...house,
-          house: number,
-        });
-      }
+      result.push({
+        ...normalizedHouse,
+        house: getHouseNumber(normalizedHouse, index + 1),
+      });
     });
 
     return result;
@@ -343,16 +348,19 @@ function normalizeHouses(data) {
 
   if (source && typeof source === "object") {
     Object.entries(source).forEach(([key, value]) => {
-      const house =
+      const fallbackNumber = getNumberFromValue(key);
+      const normalizedHouse =
         value && typeof value === "object" ? value : { sign: value };
 
-      const fallbackNumber = getNumberFromValue(key);
-      const number = getHouseNumber(house, fallbackNumber);
+      const houseNumber = getHouseNumber(
+        normalizedHouse,
+        fallbackNumber
+      );
 
-      if (number >= 1 && number <= 12) {
+      if (houseNumber >= 1 && houseNumber <= 12) {
         result.push({
-          ...house,
-          house: number,
+          ...normalizedHouse,
+          house: houseNumber,
         });
       }
     });
@@ -384,95 +392,70 @@ function getPolygonCenter(points) {
 }
 
 function getRashiPosition(layout) {
-  const points = parsePoints(layout.points);
-  const center = getPolygonCenter(points);
-
-  const towardChartCenter = {
+  const center = getPolygonCenter(parsePoints(layout.points));
+  const direction = {
     x: 200 - center.x,
     y: 200 - center.y,
   };
 
-  const length = Math.hypot(
-    towardChartCenter.x,
-    towardChartCenter.y
-  );
+  const length = Math.hypot(direction.x, direction.y);
 
-  const inward =
-    length === 0
-      ? { x: 0, y: 0 }
-      : {
-          x: towardChartCenter.x / length,
-          y: towardChartCenter.y / length,
-        };
+  if (length === 0) {
+    return center;
+  }
 
-  const offset = 20;
+  const inwardDistance = 10;
 
   return {
-    x: center.x + inward.x * offset,
-    y: center.y + inward.y * offset,
+    x: center.x + (direction.x / length) * inwardDistance,
+    y: center.y + (direction.y / length) * inwardDistance,
   };
 }
 
 function estimatePlanetWidth(label) {
   return Math.max(
-    PLANET_FONT_SIZE * 1.25,
+    PLANET_FONT_SIZE * 1.2,
     String(label).length * PLANET_FONT_SIZE * 0.62
   );
 }
 
-function makePlanetRows(planets, preferredColumns) {
-  const columns = Math.max(
+function getPlanetRows(planets, layout) {
+  const preferredColumns = Math.max(
     1,
-    Math.min(preferredColumns || 1, planets.length)
+    Math.min(layout.columns || 1, planets.length)
   );
 
-  const rows = [];
+  const availableWidth = layout.box.width - 4;
 
-  for (let index = 0; index < planets.length; index += columns) {
-    rows.push(planets.slice(index, index + columns));
-  }
+  for (
+    let columns = preferredColumns;
+    columns >= 1;
+    columns -= 1
+  ) {
+    const rows = [];
 
-  return rows;
-}
+    for (let index = 0; index < planets.length; index += columns) {
+      rows.push(planets.slice(index, index + columns));
+    }
 
-function getPlanetPacking(planets, layout) {
-  const rows = makePlanetRows(planets, layout.columns);
-  const gap = 3;
-  const box = layout.box;
+    const fits = rows.every((row) => {
+      const width = row.reduce(
+        (total, planet, index) =>
+          total +
+          estimatePlanetWidth(planet) +
+          (index === 0 ? 0 : 3),
+        0
+      );
 
-  const rowWidths = rows.map((row) =>
-    row.reduce(
-      (total, planet, index) =>
-        total +
-        estimatePlanetWidth(planet) +
-        (index === 0 ? 0 : gap),
-      0
-    )
-  );
-
-  const widestRow = Math.max(...rowWidths, 0);
-  const minimumWidth = box.width - 4;
-
-  if (widestRow > minimumWidth && layout.columns > 1) {
-    return getPlanetPacking(planets, {
-      ...layout,
-      columns: layout.columns - 1,
+      return width <= availableWidth;
     });
+
+    if (fits) {
+      return rows;
+    }
   }
 
-  const maximumLineHeight = PLANET_FONT_SIZE + 2;
-  const availableHeight = Math.max(PLANET_FONT_SIZE, box.height - 4);
-  const lineHeight = Math.min(
-    maximumLineHeight,
-    availableHeight / Math.max(rows.length, 1)
-  );
-
-  return {
-    rows,
-    gap,
-    lineHeight,
-    totalHeight: rows.length * lineHeight,
-  };
+  return planets.map((planet) => [planet]);
 }
 
 function renderPlanets({ planets, layout, houseNumber }) {
@@ -480,13 +463,13 @@ function renderPlanets({ planets, layout, houseNumber }) {
     return null;
   }
 
+  const rows = getPlanetRows(planets, layout);
   const box = layout.box;
-  const packing = getPlanetPacking(planets, layout);
-  const centerX = box.x + box.width / 2;
+  const totalHeight = rows.length * PLANET_LINE_HEIGHT;
   const firstY =
     box.y +
-    (box.height - packing.totalHeight) / 2 +
-    packing.lineHeight / 2;
+    (box.height - totalHeight) / 2 +
+    PLANET_LINE_HEIGHT / 2;
 
   return (
     <g
@@ -494,29 +477,29 @@ function renderPlanets({ planets, layout, houseNumber }) {
       aria-label={`Planets in house ${houseNumber}`}
       pointerEvents="none"
     >
-      {packing.rows.map((row, rowIndex) => {
+      {rows.map((row, rowIndex) => {
         const rowWidth = row.reduce(
           (total, planet, index) =>
             total +
             estimatePlanetWidth(planet) +
-            (index === 0 ? 0 : packing.gap),
+            (index === 0 ? 0 : 3),
           0
         );
 
-        let currentX = centerX - rowWidth / 2;
+        let currentX = box.x + box.width / 2 - rowWidth / 2;
 
         return (
           <g
             key={`planet-row-${houseNumber}-${rowIndex}`}
             transform={`translate(0 ${
-              firstY + rowIndex * packing.lineHeight
+              firstY + rowIndex * PLANET_LINE_HEIGHT
             })`}
           >
             {row.map((planet, planetIndex) => {
-              const planetWidth = estimatePlanetWidth(planet);
-              const x = currentX + planetWidth / 2;
+              const width = estimatePlanetWidth(planet);
+              const x = currentX + width / 2;
 
-              currentX += planetWidth + packing.gap;
+              currentX += width + 3;
 
               return (
                 <text
@@ -541,7 +524,7 @@ function renderPlanets({ planets, layout, houseNumber }) {
   );
 }
 
-function BirthChart({ data }) {
+export default function BirthChart({ data }) {
   const houses = normalizeHouses(data);
 
   const houseByNumber = new Map(
@@ -608,8 +591,8 @@ function BirthChart({ data }) {
                     dominantBaseline="middle"
                     fill="#fcd34d"
                     fontSize={RASHI_FONT_SIZE}
-                    fontFamily="sans-serif"
                     fontWeight="700"
+                    fontFamily="sans-serif"
                     pointerEvents="none"
                   >
                     {signNumber}
@@ -631,7 +614,7 @@ function BirthChart({ data }) {
           y="184"
           textAnchor="middle"
           dominantBaseline="middle"
-          fill="rgba(251,191,36,0.65)"
+          fill="rgba(251,191,36,0.7)"
           fontSize="10"
           fontFamily="sans-serif"
           fontStyle="italic"
