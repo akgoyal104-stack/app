@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { api, API } from "@/lib/api";
 import { toast } from "sonner";
 import { Loader2, Compass, Clock, MapPin, User, Download } from "lucide-react";
-import React, { useMemo } from "react";
+import React from "react";
 
 const SIGN_SYMBOL = {
   Aries: "♈", Taurus: "♉", Gemini: "♊", Cancer: "♋", Leo: "♌", Virgo: "♍",
@@ -23,13 +23,146 @@ function renderMarkdown(text = "") {
 }
 
 
-const SIZE = 400;
+const CHART_SIZE = 400;
 const BORDER = 20;
-const EDGE_GAP = 4;
-const LABEL_GAP = 3;
 const PLANET_FONT_SIZE = 10;
-const HOUSE_FONT_SIZE = 10;
-const LAGNA_BOX = { x: 156, y: 171, width: 88, height: 38 };
+const RASHI_FONT_SIZES = [20, 18, 16, 14, 12];
+
+const HOUSE_LAYOUTS = {
+  1: {
+    points: "200,20 290,110 200,200 110,110",
+    headerCandidates: [
+      { x: 200, houseY: 94, rashiY: 124 },
+      { x: 200, houseY: 88, rashiY: 118 },
+    ],
+    planetZones: [
+      { x: 126, y: 134, width: 148, height: 44, direction: "horizontal" },
+    ],
+  },
+  2: {
+    points: "20,20 200,20 110,110",
+    headerCandidates: [
+      { x: 110, houseY: 48, rashiY: 76 },
+      { x: 110, houseY: 44, rashiY: 70 },
+    ],
+    planetZones: [
+      { x: 34, y: 82, width: 152, height: 24, direction: "horizontal" },
+      { x: 44, y: 74, width: 132, height: 32, direction: "horizontal" },
+    ],
+  },
+  3: {
+    points: "20,20 110,110 20,200",
+    headerCandidates: [
+      { x: 62, houseY: 82, rashiY: 108 },
+      { x: 58, houseY: 78, rashiY: 104 },
+    ],
+    planetZones: [
+      { x: 28, y: 126, width: 48, height: 66, direction: "vertical" },
+    ],
+  },
+  4: {
+    points: "20,200 110,110 200,200 110,290",
+    headerCandidates: [
+      { x: 110, houseY: 166, rashiY: 194 },
+      { x: 110, houseY: 160, rashiY: 188 },
+    ],
+    planetZones: [
+      { x: 42, y: 212, width: 136, height: 62, direction: "horizontal" },
+    ],
+  },
+  5: {
+    points: "20,200 110,290 20,380",
+    headerCandidates: [
+      { x: 62, houseY: 272, rashiY: 298 },
+      { x: 58, houseY: 268, rashiY: 294 },
+    ],
+    planetZones: [
+      { x: 28, y: 310, width: 48, height: 62, direction: "vertical" },
+    ],
+  },
+  6: {
+    points: "20,380 200,380 110,290",
+    headerCandidates: [
+      { x: 110, houseY: 316, rashiY: 342 },
+      { x: 110, houseY: 310, rashiY: 336 },
+    ],
+    planetZones: [
+      { x: 42, y: 350, width: 136, height: 24, direction: "horizontal" },
+    ],
+  },
+  7: {
+    points: "110,290 200,200 290,290 200,380",
+    headerCandidates: [
+      { x: 200, houseY: 286, rashiY: 316 },
+      { x: 200, houseY: 280, rashiY: 310 },
+    ],
+    planetZones: [
+      { x: 132, y: 334, width: 136, height: 34, direction: "horizontal" },
+    ],
+  },
+  8: {
+    points: "200,380 380,380 290,290",
+    headerCandidates: [
+      { x: 290, houseY: 316, rashiY: 342 },
+      { x: 290, houseY: 310, rashiY: 336 },
+    ],
+    planetZones: [
+      { x: 222, y: 350, width: 136, height: 24, direction: "horizontal" },
+    ],
+  },
+  9: {
+    points: "380,200 380,380 290,290",
+    headerCandidates: [
+      { x: 338, houseY: 272, rashiY: 298 },
+      { x: 342, houseY: 268, rashiY: 294 },
+    ],
+    planetZones: [
+      { x: 324, y: 310, width: 48, height: 62, direction: "vertical" },
+    ],
+  },
+  10: {
+    points: "380,200 290,110 200,200 290,290",
+    headerCandidates: [
+      { x: 290, houseY: 166, rashiY: 194 },
+      { x: 290, houseY: 160, rashiY: 188 },
+    ],
+    planetZones: [
+      { x: 222, y: 212, width: 136, height: 62, direction: "horizontal" },
+    ],
+  },
+  11: {
+    points: "380,20 380,200 290,110",
+    headerCandidates: [
+      { x: 338, houseY: 82, rashiY: 108 },
+      { x: 342, houseY: 78, rashiY: 104 },
+    ],
+    planetZones: [
+      { x: 324, y: 126, width: 48, height: 66, direction: "vertical" },
+    ],
+  },
+  12: {
+    points: "200,20 380,20 290,110",
+    headerCandidates: [
+      { x: 290, houseY: 48, rashiY: 76 },
+      { x: 290, houseY: 44, rashiY: 70 },
+    ],
+    planetZones: [
+      { x: 214, y: 82, width: 152, height: 24, direction: "horizontal" },
+      { x: 224, y: 74, width: 132, height: 32, direction: "horizontal" },
+    ],
+  },
+};
+
+const NORTH_INDIAN_LINES = `
+  M20 20 L110 110 L200 20
+  M20 200 L110 110 L200 200 L110 290 L20 200
+  M20 380 L110 290 L200 380
+  M200 380 L290 290 L380 380
+  M380 380 L290 290 L380 200
+  M380 20 L290 110 L380 200
+  M200 20 L290 110 L200 200
+  M200 200 L290 290
+`;
 
 const RASHI_NUMBERS = {
   mesha: 1,
@@ -88,128 +221,6 @@ const PLANET_ABBREVIATIONS = {
   lagna: "As",
 };
 
-const HOUSES = {
-  1: {
-    polygon: [
-      [200, 20],
-      [290, 110],
-      [200, 200],
-      [110, 110],
-    ],
-    type: "diamond",
-  },
-  2: {
-    polygon: [
-      [20, 20],
-      [200, 20],
-      [110, 110],
-    ],
-    type: "triangle",
-    inner: [110, 110],
-  },
-  3: {
-    polygon: [
-      [20, 20],
-      [110, 110],
-      [20, 200],
-    ],
-    type: "triangle",
-    inner: [110, 110],
-  },
-  4: {
-    polygon: [
-      [20, 200],
-      [110, 110],
-      [200, 200],
-      [110, 290],
-    ],
-    type: "diamond",
-  },
-  5: {
-    polygon: [
-      [20, 200],
-      [110, 290],
-      [20, 380],
-    ],
-    type: "triangle",
-    inner: [110, 290],
-  },
-  6: {
-    polygon: [
-      [20, 380],
-      [200, 380],
-      [110, 290],
-    ],
-    type: "triangle",
-    inner: [110, 290],
-  },
-  7: {
-    polygon: [
-      [110, 290],
-      [200, 200],
-      [290, 290],
-      [200, 380],
-    ],
-    type: "diamond",
-  },
-  8: {
-    polygon: [
-      [200, 380],
-      [380, 380],
-      [290, 290],
-    ],
-    type: "triangle",
-    inner: [290, 290],
-  },
-  9: {
-    polygon: [
-      [380, 200],
-      [380, 380],
-      [290, 290],
-    ],
-    type: "triangle",
-    inner: [290, 290],
-  },
-  10: {
-    polygon: [
-      [380, 200],
-      [290, 110],
-      [200, 200],
-      [290, 290],
-    ],
-    type: "diamond",
-  },
-  11: {
-    polygon: [
-      [380, 20],
-      [380, 200],
-      [290, 110],
-    ],
-    type: "triangle",
-    inner: [290, 110],
-  },
-  12: {
-    polygon: [
-      [200, 20],
-      [380, 20],
-      [290, 110],
-    ],
-    type: "triangle",
-    inner: [290, 110],
-  },
-};
-
-const NORTH_INDIAN_LINES = `
-  M20 20 L110 110 L200 20
-  M20 200 L110 110 L200 200 L110 290 L20 200
-  M20 380 L110 290 L200 380
-  M200 380 L290 290 L380 380
-  M380 380 L290 290 L380 200
-  M380 20 L290 110 L380 200
-  M200 20 L290 110 L200 200
-  M200 200 L290 290
-`;
-
 function normalizeText(value) {
   return String(value ?? "")
     .trim()
@@ -217,102 +228,115 @@ function normalizeText(value) {
     .replace(/[\s_-]+/g, "");
 }
 
-function numberFrom(value) {
+function getNumberFromValue(value) {
   if (typeof value === "number") {
     return Number.isFinite(value) ? value : "";
   }
 
   const text = String(value ?? "").trim();
-  if (!text) return "";
 
-  const direct = Number(text);
-  if (Number.isFinite(direct)) return direct;
+  if (!text) {
+    return "";
+  }
+
+  const directNumber = Number(text);
+
+  if (Number.isFinite(directNumber)) {
+    return directNumber;
+  }
 
   const match = text.match(/\d+/);
+
   return match ? Number(match[0]) : "";
 }
 
 function getRashiNumber(value) {
-  const numeric = numberFrom(value);
-  if (numeric >= 1 && numeric <= 12) return numeric;
+  const numericValue = getNumberFromValue(value);
+
+  if (numericValue >= 1 && numericValue <= 12) {
+    return numericValue;
+  }
+
   return RASHI_NUMBERS[normalizeText(value)] || "";
 }
 
-function getPlanetAbbreviation(value) {
-  let source = value;
+function getPlanetAbbreviation(planet) {
+  let value = planet;
 
-  if (value && typeof value === "object") {
-    source =
-      value.abbreviation ??
-      value.abbr ??
-      value.shortName ??
-      value.name ??
-      value.planet ??
-      value.graha ??
-      value.body ??
+  if (planet && typeof planet === "object") {
+    value =
+      planet.abbreviation ??
+      planet.abbr ??
+      planet.shortName ??
+      planet.name ??
+      planet.planet ??
+      planet.graha ??
+      planet.body ??
       "";
   }
 
-  const text = String(source ?? "").trim();
-  if (!text) return "";
+  const text = String(value ?? "").trim();
+
+  if (!text) {
+    return "";
+  }
 
   const normalized = normalizeText(text);
+
   if (PLANET_ABBREVIATIONS[normalized]) {
     return PLANET_ABBREVIATIONS[normalized];
   }
 
-  const explicit = text.match(/\(([A-Za-z]{1,3})\)/);
-  if (explicit) return explicit[1];
+  const abbreviationMatch = text.match(/\(([A-Za-z]{1,3})\)/);
+
+  if (abbreviationMatch) {
+    return abbreviationMatch[1];
+  }
 
   return text.slice(0, 2);
 }
 
-function getHouseNumber(value, fallback) {
-  if (!value || typeof value !== "object") return fallback;
-
-  const possibleValues = [
-    value.house,
-    value.houseNumber,
-    value.house_number,
-    value.houseNo,
-    value.house_no,
-    value.bhava,
-    value.bhavaNumber,
-    value.number,
-  ];
-
-  for (const item of possibleValues) {
-    const number = numberFrom(item);
-    if (number >= 1 && number <= 12) return number;
+function getHouseNumber(house, fallbackNumber) {
+  if (!house || typeof house !== "object") {
+    return fallbackNumber;
   }
 
-  return fallback;
-}
+  const values = [
+    house.house,
+    house.houseNumber,
+    house.house_number,
+    house.houseNo,
+    house.house_no,
+    house.bhava,
+    house.bhavaNumber,
+    house.number,
+  ];
 
-function getHouseSign(house) {
-  return (
-    house?.sign ??
-    house?.rashi ??
-    house?.signNumber ??
-    house?.sign_number ??
-    house?.rashiNumber ??
-    house?.rashi_number ??
-    house?.signNo ??
-    house?.rashiNo ??
-    ""
-  );
+  for (const value of values) {
+    const number = getNumberFromValue(value);
+
+    if (number >= 1 && number <= 12) {
+      return number;
+    }
+  }
+
+  return fallbackNumber;
 }
 
 function getHousePlanets(house) {
+  if (!house || typeof house !== "object") {
+    return [];
+  }
+
   const value =
-    house?.planets ??
-    house?.planet ??
-    house?.grahas ??
-    house?.occupants ??
-    house?.bodies ??
-    house?.planetNames ??
-    house?.planet_names ??
-    house?.planetaryPositions ??
+    house.planets ??
+    house.planet ??
+    house.grahas ??
+    house.occupants ??
+    house.bodies ??
+    house.planetNames ??
+    house.planet_names ??
+    house.planetaryPositions ??
     [];
 
   if (Array.isArray(value)) {
@@ -347,18 +371,30 @@ function normalizeHouses(data) {
   if (Array.isArray(source)) {
     source.forEach((house, index) => {
       const number = getHouseNumber(house, index + 1);
-      if (number >= 1 && number <= 12) {
-        result.push({ ...house, house: number });
-      }
-    });
-  } else if (source && typeof source === "object") {
-    Object.entries(source).forEach(([key, value]) => {
-      const fallback = numberFrom(key);
-      const house = value && typeof value === "object" ? value : { sign: value };
-      const number = getHouseNumber(house, fallback);
 
       if (number >= 1 && number <= 12) {
-        result.push({ ...house, house: number });
+        result.push({
+          ...house,
+          house: number,
+        });
+      }
+    });
+
+    return result;
+  }
+
+  if (source && typeof source === "object") {
+    Object.entries(source).forEach(([key, value]) => {
+      const fallbackNumber = getNumberFromValue(key);
+      const house =
+        value && typeof value === "object" ? value : { sign: value };
+      const number = getHouseNumber(house, fallbackNumber);
+
+      if (number >= 1 && number <= 12) {
+        result.push({
+          ...house,
+          house: number,
+        });
       }
     });
   }
@@ -366,71 +402,73 @@ function normalizeHouses(data) {
   return result;
 }
 
-function centerOf(polygon) {
-  const total = polygon.reduce(
-    (result, [x, y]) => ({
-      x: result.x + x,
-      y: result.y + y,
-    }),
-    { x: 0, y: 0 }
+function getHouseSign(house) {
+  if (!house || typeof house !== "object") {
+    return "";
+  }
+
+  return (
+    house.sign ??
+    house.rashi ??
+    house.signNumber ??
+    house.sign_number ??
+    house.rashiNumber ??
+    house.rashi_number ??
+    house.signNo ??
+    house.rashiNo ??
+    ""
   );
-
-  return {
-    x: total.x / polygon.length,
-    y: total.y / polygon.length,
-  };
 }
 
-function interpolate(a, b, amount) {
-  return {
-    x: a.x + (b.x - a.x) * amount,
-    y: a.y + (b.y - a.y) * amount,
-  };
+function parsePoints(points) {
+  return points.split(/\s+/).map((point) => {
+    const [x, y] = point.split(",").map(Number);
+    return { x, y };
+  });
 }
 
-function pointInside(point, polygon) {
+function pointInPolygon(point, polygon) {
   let inside = false;
 
-  for (let index = 0, previous = polygon.length - 1; index < polygon.length; previous = index++) {
-    const [xi, yi] = polygon[index];
-    const [xj, yj] = polygon[previous];
+  for (
+    let current = 0, previous = polygon.length - 1;
+    current < polygon.length;
+    previous = current++
+  ) {
+    const currentPoint = polygon[current];
+    const previousPoint = polygon[previous];
 
     const intersects =
-      yi > point.y !== yj > point.y &&
-      point.x < ((xj - xi) * (point.y - yi)) / (yj - yi) + xi;
+      currentPoint.y > point.y !== previousPoint.y > point.y &&
+      point.x <
+        ((previousPoint.x - currentPoint.x) *
+          (point.y - currentPoint.y)) /
+          (previousPoint.y - currentPoint.y) +
+          currentPoint.x;
 
-    if (intersects) inside = !inside;
+    if (intersects) {
+      inside = !inside;
+    }
   }
 
   return inside;
 }
 
-function horizontalSpan(y, polygon) {
-  const intersections = [];
+function rectInsidePolygon(rect, polygon, padding = 2) {
+  const points = [
+    { x: rect.x + padding, y: rect.y + padding },
+    { x: rect.x + rect.width - padding, y: rect.y + padding },
+    {
+      x: rect.x + rect.width - padding,
+      y: rect.y + rect.height - padding,
+    },
+    { x: rect.x + padding, y: rect.y + rect.height - padding },
+  ];
 
-  for (let index = 0; index < polygon.length; index += 1) {
-    const [x1, y1] = polygon[index];
-    const [x2, y2] = polygon[(index + 1) % polygon.length];
-
-    if ((y1 <= y && y < y2) || (y2 <= y && y < y1)) {
-      const x = x1 + ((y - y1) * (x2 - x1)) / (y2 - y1);
-      intersections.push(x);
-    }
-  }
-
-  if (intersections.length < 2) return null;
-
-  return {
-    left: Math.min(...intersections),
-    right: Math.max(...intersections),
-  };
+  return points.every((point) => pointInPolygon(point, polygon));
 }
 
-function textWidth(text, fontSize) {
-  return Math.max(fontSize * 1.5, String(text).length * fontSize * 0.63);
-}
-
-function rectanglesOverlap(first, second, gap = 0) {
+function rectsOverlap(first, second, gap = 1) {
   return !(
     first.x + first.width + gap <= second.x ||
     second.x + second.width + gap <= first.x ||
@@ -439,354 +477,269 @@ function rectanglesOverlap(first, second, gap = 0) {
   );
 }
 
-function rectangleInsidePolygon(rectangle, polygon) {
-  const expanded = {
-    x: rectangle.x - EDGE_GAP,
-    y: rectangle.y - EDGE_GAP,
-    width: rectangle.width + EDGE_GAP * 2,
-    height: rectangle.height + EDGE_GAP * 2,
-  };
-
-  const corners = [
-    { x: expanded.x, y: expanded.y },
-    { x: expanded.x + expanded.width, y: expanded.y },
-    { x: expanded.x, y: expanded.y + expanded.height },
-    {
-      x: expanded.x + expanded.width,
-      y: expanded.y + expanded.height,
-    },
-  ];
-
-  return corners.every((corner) => pointInside(corner, polygon));
+function textWidth(text, fontSize) {
+  return Math.max(fontSize * 1.2, String(text).length * fontSize * 0.62);
 }
 
-function createTextPlacement(text, x, y, fontSize, polygon) {
+function makeTextRect(x, baselineY, text, fontSize, fontFamily = "monospace") {
   const width = textWidth(text, fontSize);
-  const height = fontSize * 1.35;
+  const height = fontSize * (fontFamily === "sans-serif" ? 1.15 : 1.1);
 
-  const spans = [
-    horizontalSpan(y - height / 2, polygon),
-    horizontalSpan(y, polygon),
-    horizontalSpan(y + height / 2, polygon),
-  ];
-
-  if (spans.some((span) => !span)) return null;
-
-  const left = Math.max(...spans.map((span) => span.left));
-  const right = Math.min(...spans.map((span) => span.right));
-  const minimumWidth = width + EDGE_GAP * 2;
-
-  if (right - left < minimumWidth) return null;
-
-  const safeX = Math.min(
-    right - width / 2 - EDGE_GAP,
-    Math.max(left + width / 2 + EDGE_GAP, x)
-  );
-
-  const rectangle = {
-    x: safeX - width / 2,
-    y: y - height / 2,
+  return {
+    x: x - width / 2,
+    y: baselineY - height * 0.78,
     width,
     height,
   };
+}
 
-  if (!rectangleInsidePolygon(rectangle, polygon)) return null;
+function createHeader(number, signNumber, layout) {
+  if (signNumber === "") {
+    return {
+      items: [
+        {
+          type: "house",
+          x: layout.headerCandidates[0].x,
+          y: layout.headerCandidates[0].houseY,
+          fontSize: 10,
+        },
+      ],
+      rects: [],
+      rashiFontSize: 20,
+    };
+  }
+
+  const polygon = parsePoints(layout.points);
+
+  for (const candidate of layout.headerCandidates) {
+    for (const rashiFontSize of RASHI_FONT_SIZES) {
+      const houseText = `H${number}`;
+      const houseRect = makeTextRect(
+        candidate.x,
+        candidate.houseY,
+        houseText,
+        10
+      );
+      const rashiRect = makeTextRect(
+        candidate.x,
+        candidate.rashiY,
+        String(signNumber),
+        rashiFontSize,
+        "sans-serif"
+      );
+
+      const separated =
+        !rectsOverlap(houseRect, rashiRect, 2) &&
+        rectInsidePolygon(houseRect, polygon, 2) &&
+        rectInsidePolygon(rashiRect, polygon, 2);
+
+      if (separated) {
+        return {
+          items: [
+            {
+              type: "house",
+              x: candidate.x,
+              y: candidate.houseY,
+              fontSize: 10,
+            },
+            {
+              type: "rashi",
+              x: candidate.x,
+              y: candidate.rashiY,
+              fontSize: rashiFontSize,
+            },
+          ],
+          rects: [houseRect, rashiRect],
+          rashiFontSize,
+        };
+      }
+    }
+  }
 
   return {
-    text,
-    x: safeX,
-    y,
-    fontSize,
-    rectangle,
+    items: [],
+    rects: [],
+    rashiFontSize: 12,
   };
 }
 
-function isPlacementAvailable(placement, occupied) {
-  if (!placement) return false;
+function getPackedRows(planets, box, fontSize) {
+  const gap = 3;
+  const rows = [];
+  let row = [];
+  let rowWidth = 0;
+  const availableWidth = box.width - 4;
 
-  if (
-    placement.rectangle &&
-    rectanglesOverlap(placement.rectangle, LAGNA_BOX, LABEL_GAP)
-  ) {
-    return false;
-  }
+  planets.forEach((planet) => {
+    const width = textWidth(planet, fontSize);
+    const requiredWidth = rowWidth + (row.length ? gap : 0) + width;
 
-  return occupied.every(
-    (item) =>
-      !rectanglesOverlap(placement.rectangle, item.rectangle, LABEL_GAP)
-  );
-}
-
-function labelAnchors(layout) {
-  const center = centerOf(layout.polygon);
-
-  if (layout.type === "diamond") {
-    const amounts = [0.62, 0.52, 0.42, 0.32];
-
-    return amounts.flatMap((amount, index) => {
-      const target = interpolate(center, { x: 200, y: 200 }, amount);
-      const offset = index % 2 === 0 ? 8 : -8;
-
-      return [
-        { x: target.x + offset, y: target.y - 15 },
-        { x: target.x - offset, y: target.y - 15 },
-        { x: target.x + offset, y: target.y + 15 },
-        { x: target.x - offset, y: target.y + 15 },
-      ];
-    });
-  }
-
-  const centerTarget = layout.inner;
-  const amounts = [0.72, 0.62, 0.52, 0.42];
-
-  return amounts.flatMap((amount, index) => {
-    const target = interpolate(center, {
-      x: centerTarget[0],
-      y: centerTarget[1],
-    }, amount);
-
-    const offset = index % 2 === 0 ? 7 : -7;
-
-    return [
-      { x: target.x + offset, y: target.y - 14 },
-      { x: target.x - offset, y: target.y - 14 },
-      { x: target.x + offset, y: target.y + 14 },
-      { x: target.x - offset, y: target.y + 14 },
-    ];
+    if (row.length && requiredWidth > availableWidth) {
+      rows.push(row);
+      row = [planet];
+      rowWidth = width;
+    } else {
+      row.push(planet);
+      rowWidth = requiredWidth;
+    }
   });
+
+  if (row.length) {
+    rows.push(row);
+  }
+
+  return { rows, gap };
 }
 
-function placeHouseLabels(number, layout, signNumber, occupied) {
-  const anchors = labelAnchors(layout);
+function createHorizontalPlanetItems(planets, box, polygon, blockedRects) {
+  const packing = getPackedRows(planets, box, PLANET_FONT_SIZE);
+  const lineHeight = PLANET_FONT_SIZE + 2;
+  const totalHeight = packing.rows.length * lineHeight;
+  const firstY = box.y + (box.height - totalHeight) / 2 + lineHeight / 2;
+  const items = [];
+  const rects = [...blockedRects];
 
-  for (const anchor of anchors) {
-    const houseLabel = createTextPlacement(
-      `H${number}`,
-      anchor.x,
-      anchor.y,
-      HOUSE_FONT_SIZE,
-      layout.polygon
+  packing.rows.forEach((row, rowIndex) => {
+    const rowWidth = row.reduce(
+      (total, planet, index) =>
+        total +
+        textWidth(planet, PLANET_FONT_SIZE) +
+        (index ? packing.gap : 0),
+      0
     );
 
-    if (!isPlacementAvailable(houseLabel, occupied)) continue;
+    let currentX = box.x + box.width / 2 - rowWidth / 2;
 
-    if (signNumber === "") {
-      return {
-        labels: [houseLabel],
-        occupied: [...occupied, houseLabel],
-        rashiFontSize: null,
-      };
-    }
-
-    const rashiSizes = [20, 18, 16, 14, 12, 10, 8];
-
-    for (const rashiFontSize of rashiSizes) {
-      const rashiLabel = createTextPlacement(
-        String(signNumber),
-        anchor.x,
-        anchor.y + 30,
-        rashiFontSize,
-        layout.polygon
+    row.forEach((planet) => {
+      const width = textWidth(planet, PLANET_FONT_SIZE);
+      const centerX = currentX + width / 2;
+      const baselineY = firstY + rowIndex * lineHeight;
+      const rect = makeTextRect(
+        centerX,
+        baselineY,
+        planet,
+        PLANET_FONT_SIZE
       );
 
-      if (!isPlacementAvailable(rashiLabel, [...occupied, houseLabel])) {
-        continue;
+      const valid =
+        rectInsidePolygon(rect, polygon, 2) &&
+        rects.every((existing) => !rectsOverlap(rect, existing, 1));
+
+      if (valid) {
+        items.push({
+          type: "planet",
+          text: planet,
+          x: centerX,
+          y: baselineY,
+          fontSize: PLANET_FONT_SIZE,
+        });
+        rects.push(rect);
       }
 
-      return {
-        labels: [houseLabel, rashiLabel],
-        occupied: [...occupied, houseLabel, rashiLabel],
-        rashiFontSize,
-      };
-    }
-  }
-
-  return null;
-}
-
-function planetRows(planets, layout) {
-  if (layout.type === "triangle") {
-    return planets.map((planet) => [planet]);
-  }
-
-  return [planets];
-}
-
-function placePlanets(planets, layout, occupied) {
-  if (!planets.length) {
-    return { labels: [], unresolved: [], occupied };
-  }
-
-  const rows = planetRows(planets, layout);
-  const polygonCenter = centerOf(layout.polygon);
-  const candidates = [];
-
-  for (let y = 28; y <= 372; y += 4) {
-    for (let x = 28; x <= 372; x += 4) {
-      candidates.push({
-        x,
-        y,
-        distance:
-          Math.abs(x - polygonCenter.x) +
-          Math.abs(y - polygonCenter.y),
-      });
-    }
-  }
-
-  candidates.sort((a, b) => a.distance - b.distance);
-
-  for (const candidate of candidates) {
-    const labels = [];
-    let valid = true;
-
-    rows.forEach((row, rowIndex) => {
-      const text = row.join(" ");
-      const placement = createTextPlacement(
-        text,
-        candidate.x,
-        candidate.y + rowIndex * 14,
-        PLANET_FONT_SIZE,
-        layout.polygon
-      );
-
-      if (!isPlacementAvailable(placement, [...occupied, ...labels])) {
-        valid = false;
-      } else if (placement) {
-        labels.push(placement);
-      }
+      currentX += width + packing.gap;
     });
+  });
 
-    if (valid && labels.length === rows.length) {
-      return {
-        labels,
-        unresolved: [],
-        occupied: [...occupied, ...labels],
-      };
+  return items.length === planets.length ? { items, rects } : null;
+}
+
+function createVerticalPlanetItems(planets, box, polygon, blockedRects) {
+  const lineHeight = PLANET_FONT_SIZE + 2;
+  const totalHeight = planets.length * lineHeight;
+  const firstY = box.y + (box.height - totalHeight) / 2 + lineHeight / 2;
+  const centerX = box.x + box.width / 2;
+  const items = [];
+  const rects = [...blockedRects];
+
+  planets.forEach((planet, index) => {
+    const baselineY = firstY + index * lineHeight;
+    const rect = makeTextRect(
+      centerX,
+      baselineY,
+      planet,
+      PLANET_FONT_SIZE
+    );
+
+    const valid =
+      rectInsidePolygon(rect, polygon, 2) &&
+      rects.every((existing) => !rectsOverlap(rect, existing, 1));
+
+    if (valid) {
+      items.push({
+        type: "planet",
+        text: planet,
+        x: centerX,
+        y: baselineY,
+        fontSize: PLANET_FONT_SIZE,
+      });
+      rects.push(rect);
+    }
+  });
+
+  return items.length === planets.length ? { items, rects } : null;
+}
+
+function createPlanetItems(planets, layout, headerRects) {
+  if (!planets.length) {
+    return [];
+  }
+
+  const polygon = parsePoints(layout.points);
+
+  for (const zone of layout.planetZones) {
+    const result =
+      zone.direction === "vertical"
+        ? createVerticalPlanetItems(
+            planets,
+            zone,
+            polygon,
+            headerRects
+          )
+        : createHorizontalPlanetItems(
+            planets,
+            zone,
+            polygon,
+            headerRects
+          );
+
+    if (result) {
+      return result.items;
     }
   }
 
-  return {
-    labels: [],
-    unresolved: planets,
-    occupied,
-  };
-}
-
-function renderText(placement, color, weight = 500, family = "monospace") {
-  return (
-    <text
-      key={`${placement.text}-${placement.x}-${placement.y}`}
-      x={placement.x}
-      y={placement.y}
-      textAnchor="middle"
-      dominantBaseline="middle"
-      fill={color}
-      fontSize={placement.fontSize}
-      fontFamily={family}
-      fontWeight={weight}
-      pointerEvents="none"
-    >
-      {placement.text}
-    </text>
-  );
+  return [];
 }
 
 function ChartVisual({ data }) {
-  const { elements, overflow } = useMemo(() => {
-    const houses = normalizeHouses(data);
-    const houseByNumber = new Map(
-      houses.map((house) => [Number(house.house), house])
-    );
-
-    const nextElements = [];
-    const unresolved = [];
-    let occupied = [];
-
-    Object.entries(HOUSES).forEach(([key, layout]) => {
-      const number = Number(key);
-      const house = houseByNumber.get(number);
-      const signNumber = house ? getRashiNumber(getHouseSign(house)) : "";
-      const planets = house ? getHousePlanets(house) : [];
-
-      const placedLabels = placeHouseLabels(
-        number,
-        layout,
-        signNumber,
-        occupied
-      );
-
-      if (!placedLabels) {
-        unresolved.push({
-          house: number,
-          text: `H${number}${signNumber !== "" ? ` / Rashi ${signNumber}` : ""}`,
-        });
-
-        if (planets.length) {
-          unresolved.push({
-            house: number,
-            text: `Planets: ${planets.join(", ")}`,
-          });
-        }
-
-        return;
-      }
-
-      occupied = placedLabels.occupied;
-
-      placedLabels.labels.forEach((label) => {
-        nextElements.push({
-          type: label.text.startsWith("H") ? "house" : "rashi",
-          label,
-        });
-      });
-
-      const planetResult = placePlanets(planets, layout, occupied);
-      occupied = planetResult.occupied;
-
-      planetResult.labels.forEach((label) => {
-        nextElements.push({
-          type: "planet",
-          label,
-        });
-      });
-
-      if (planetResult.unresolved.length) {
-        unresolved.push({
-          house: number,
-          text: `Planets: ${planetResult.unresolved.join(", ")}`,
-        });
-      }
-    });
-
-    return {
-      elements: nextElements,
-      overflow: unresolved,
-    };
-  }, [data]);
+  const houses = normalizeHouses(data);
+  const houseByNumber = new Map(
+    houses.map((house) => [Number(house.house), house])
+  );
 
   return (
-    <div className="mx-auto w-full max-w-md">
+    <div className="relative mx-auto aspect-square w-full max-w-md">
       <svg
-        viewBox="0 0 400 400"
-        className="h-auto w-full rounded-xl"
+        viewBox={`0 0 ${CHART_SIZE} ${CHART_SIZE}`}
+        className="h-full w-full rounded-xl"
         role="img"
         aria-label="North Indian Vedic birth chart"
+        overflow="hidden"
       >
         <rect
-          x="20"
-          y="20"
-          width="360"
-          height="360"
-          fill="#0b0922"
+          x={BORDER}
+          y={BORDER}
+          width={CHART_SIZE - BORDER * 2}
+          height={CHART_SIZE - BORDER * 2}
+          fill="rgba(0,0,0,0.4)"
         />
 
         <rect
-          x="20"
-          y="20"
-          width="360"
-          height="360"
+          x={BORDER}
+          y={BORDER}
+          width={CHART_SIZE - BORDER * 2}
+          height={CHART_SIZE - BORDER * 2}
           fill="none"
-          stroke="#c69200"
+          stroke="rgba(251,191,36,0.7)"
           strokeWidth="2"
           vectorEffect="non-scaling-stroke"
         />
@@ -794,25 +747,78 @@ function ChartVisual({ data }) {
         <path
           d={NORTH_INDIAN_LINES}
           fill="none"
-          stroke="#c69200"
+          stroke="rgba(251,191,36,0.7)"
           strokeWidth="2"
           strokeLinecap="butt"
           strokeLinejoin="miter"
           vectorEffect="non-scaling-stroke"
         />
 
-        {elements.map((item) => {
-          const { label } = item;
+        {Object.entries(HOUSE_LAYOUTS).map(([houseKey, layout]) => {
+          const houseNumber = Number(houseKey);
+          const house = houseByNumber.get(houseNumber);
+          const signNumber = house
+            ? getRashiNumber(getHouseSign(house))
+            : "";
+          const planets = house ? getHousePlanets(house) : [];
+          const header = createHeader(
+            houseNumber,
+            signNumber,
+            layout
+          );
+          const planetItems = createPlanetItems(
+            planets,
+            layout,
+            header.rects
+          );
 
-          if (item.type === "house") {
-            return renderText(label, "#d6a900", 500);
-          }
+          return (
+            <g key={`house-${houseNumber}`}>
+              {header.items.map((item, index) => (
+                <text
+                  key={`header-${houseNumber}-${index}`}
+                  x={item.x}
+                  y={item.y}
+                  textAnchor="middle"
+                  dominantBaseline="middle"
+                  fill={
+                    item.type === "rashi"
+                      ? "#fcd34d"
+                      : "rgba(251,191,36,0.8)"
+                  }
+                  fontSize={item.fontSize}
+                  fontFamily={
+                    item.type === "rashi"
+                      ? "sans-serif"
+                      : "monospace"
+                  }
+                  fontWeight={item.type === "rashi" ? "700" : "500"}
+                  pointerEvents="none"
+                >
+                  {item.type === "house"
+                    ? `H${houseNumber}`
+                    : signNumber}
+                </text>
+              ))}
 
-          if (item.type === "rashi") {
-            return renderText(label, "#ffd84d", 700, "sans-serif");
-          }
-
-          return renderText(label, "#e2e8f0", 500);
+              {planetItems.map((item, index) => (
+                <text
+                  key={`planet-${houseNumber}-${index}`}
+                  x={item.x}
+                  y={item.y}
+                  textAnchor="middle"
+                  dominantBaseline="middle"
+                  fill="#e2e8f0"
+                  fontSize={PLANET_FONT_SIZE}
+                  fontFamily="monospace"
+                  fontWeight="500"
+                  pointerEvents="none"
+                >
+                  {item.text}
+                </text>
+              ))}
+            </g>
+          );
         })}
 
         <text
@@ -820,7 +826,7 @@ function ChartVisual({ data }) {
           y="184"
           textAnchor="middle"
           dominantBaseline="middle"
-          fill="#c69200"
+          fill="rgba(251,191,36,0.7)"
           fontSize="10"
           fontFamily="sans-serif"
           fontStyle="italic"
@@ -838,24 +844,12 @@ function ChartVisual({ data }) {
           strokeWidth="1"
         />
       </svg>
-
-      {overflow.length > 0 && (
-        <div className="mt-3 rounded-lg border border-amber-300/40 bg-amber-50 p-3 text-sm text-amber-950">
-          <div className="font-semibold">
-            Content moved outside the chart to prevent collisions
-          </div>
-
-          <ul className="mt-2 list-disc space-y-1 pl-5">
-            {overflow.map((item, index) => (
-              <li key={`${item.house}-${item.text}-${index}`}>
-                House {item.house}: {item.text}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
     </div>
   );
+}
+
+export default function BirthChart({ data }) {
+  return <ChartVisual data={data} />;
 }
 
 function PlanetsTable({ planets }) {
