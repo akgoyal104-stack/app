@@ -691,7 +691,7 @@ function renderText(placement, color, weight = 500, family = "monospace") {
   );
 }
 
-export default function ChartVisual({ data }) {
+function ChartVisual({ data }) {
   const { elements, overflow } = useMemo(() => {
     const houses = normalizeHouses(data);
     const houseByNumber = new Map(
