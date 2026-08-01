@@ -266,7 +266,7 @@ function renderPlanets({ planets, layout, houseNumber }) {
 
   const zone = layout.planets;
   const rows = makePlanetRows(planets, zone.columns);
-  const fontSize = planets.length >= 5 ? 9 : planets.length >= 3 ? 12 : 15;
+  const fontSize = planets.length >= 5 ? 10 : planets.length >= 3 ? 15 : 15;
   const lineHeight = fontSize + 3;
   const firstY = zone.y - ((rows.length - 1) * lineHeight) / 2;
 
