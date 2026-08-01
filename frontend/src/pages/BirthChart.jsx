@@ -119,12 +119,12 @@ const HOUSE_LAYOUT = {
   2: {
     house: { x: 110, y: 60 },
     rashi: { x: 110, y: 80 },
-    planets: { x: 70, y: 30, columns: 3 },
+    planets: { x: 70, y: 40, columns: 3 },
   },
   3: {
     house: { x: 60, y: 90 },
     rashi: { x: 60, y: 110 },
-    planets: { x: 30, y: 75, columns: 2 },
+    planets: { x: 40, y: 75, columns: 2 },
   },
   4: {
     house: { x: 75, y: 180 },
@@ -134,7 +134,7 @@ const HOUSE_LAYOUT = {
   5: {
     house: { x: 60, y: 275 },
     rashi: { x: 60, y: 295 },
-    planets: { x: 30, y: 260, columns: 2 },
+    planets: { x: 40, y: 260, columns: 2 },
   },
   6: {
     house: { x: 110, y: 320 },
@@ -144,7 +144,7 @@ const HOUSE_LAYOUT = {
   7: {
     house: { x: 200, y: 355 },
     rashi: { x: 200, y: 335 },
-    planets: { x: 180, y: 270, columns: 2 },
+    planets: { x: 200, y: 270, columns: 2 },
   },
   8: {
     house: { x: 290, y: 320 },
@@ -154,7 +154,7 @@ const HOUSE_LAYOUT = {
   9: {
     house: { x: 340, y: 275 },
     rashi: { x: 340, y: 295 },
-    planets: { x: 370, y: 255, columns: 1 },
+    planets: { x: 360, y: 255, columns: 1 },
   },
   10: {
     house: { x: 325, y: 180 },
@@ -164,12 +164,12 @@ const HOUSE_LAYOUT = {
   11: {
     house: { x: 340, y: 90 },
     rashi: { x: 340, y: 110 },
-    planets: { x: 370, y: 75, columns: 1 },
+    planets: { x: 360, y: 75, columns: 1 },
   },
   12: {
     house: { x: 290, y: 60 },
     rashi: { x: 290, y: 80 },
-    planets: { x: 250, y: 30, columns: 3 },
+    planets: { x: 250, y: 40, columns: 3 },
   },
 };
 
@@ -216,6 +216,7 @@ function getPlanetAbbreviation(planet) {
 
   const cleanValue = String(value || "").trim();
 
+  
   if (!cleanValue) {
     return "";
   }
@@ -265,7 +266,7 @@ function renderPlanets({ planets, layout, houseNumber }) {
 
   const zone = layout.planets;
   const rows = makePlanetRows(planets, zone.columns);
-  const fontSize = planets.length >= 5 ? 8 : planets.length >= 3 ? 9 : 10;
+  const fontSize = planets.length >= 5 ? 9 : planets.length >= 3 ? 12 : 15;
   const lineHeight = fontSize + 3;
   const firstY = zone.y - ((rows.length - 1) * lineHeight) / 2;
 
